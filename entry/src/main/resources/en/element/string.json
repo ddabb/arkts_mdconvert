@@ -1,0 +1,72 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Main module of MdConvert"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "MdConvert app entry"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "MdConvert"
+    },
+    {
+      "name": "app_tagline",
+      "value": "Native Markdown multi-format converter"
+    },
+    {
+      "name": "buyout_note",
+      "value": "One-time purchase · No ads · No subscription"
+    },
+    {
+      "name": "offline_note",
+      "value": "No network permission · Fully offline"
+    },
+    {
+      "name": "scaffold_title",
+      "value": "M0 scaffold"
+    },
+    {
+      "name": "scaffold_desc",
+      "value": "Core modules land in batches per the dev plan. This is a placeholder home page."
+    },
+    {
+      "name": "plan_note",
+      "value": "Dev plan, milestones, and acceptance criteria live in docs/."
+    },
+    {
+      "name": "version_label",
+      "value": "Version"
+    },
+    {
+      "name": "version_value",
+      "value": "v1.0.0"
+    },
+    {
+      "name": "mod_parser",
+      "value": "In-house controlled MD parser"
+    },
+    {
+      "name": "mod_json",
+      "value": "Convert to JSON / YAML"
+    },
+    {
+      "name": "mod_docx",
+      "value": "Convert to Word (.docx)"
+    },
+    {
+      "name": "mod_mindmap",
+      "value": "Convert to mind map (PNG / .mm / .opml)"
+    },
+    {
+      "name": "mod_batch",
+      "value": "Batch conversion"
+    },
+    {
+      "name": "mod_offline",
+      "value": "Local offline, zero upload"
+    }
+  ]
+}
