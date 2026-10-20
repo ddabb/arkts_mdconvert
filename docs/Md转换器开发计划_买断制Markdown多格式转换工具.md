@@ -241,3 +241,14 @@ entry/src/main/ets/
 
 ## 15. 执行记录
 （随开发滚动更新。）
+
+### M0 完成（2026-10-20）
+- 工程脚手架：`com.ddabb.mdconvert` 单 HAP、零权限、phone/tablet/2in1；已推送 github.com/ddabb/arkts_mdconvert（main）。
+- 数据模型 `core/MdModel.ets`（MdDoc/MdBlock/MdInline 类族 + collectMdText）+ 自研受控块级解析器 `core/MdParser.ets`：标题/段落/嵌套列表（loose/tight/lazy）/fenced 代码/引用/表格（对齐、转义管道、列数不齐降级）/分隔线；未知语法降级为原文段落（内容不丢）。
+- mdCoreTest 53 用例全绿（模拟器 aa test：Tests run: 53, Pass: 53, Failure: 0）——「块级黄金全绿 + 无损回环通过」双门槛达成（alnum/CJK 子序列断言，用例数 53 ≥ 计划 30）。
+- 应用图标：MD 文档卡 + 转换箭头徽章，品牌蓝渐变（AppScope 与 entry 双端同步）。
+- 已知边界（内容无损前提下的 M0 简化，后续版本按需增强）：Setext 标题、4 空格缩进代码块降级为段落；有序列表序号原样保留。
+
+### M1 进行中（2026-10-20 启动）
+- 行内解析器 `core/MdInlineParser.ets`：粗体/斜体/删除线/行内代码/链接/图片/转义，嵌套递归，未闭合标记字面保留。
+- 新增 `mdInlineTest` 黄金用例集；`MdParser.parse` 保持纯块级，组合入口 `MdInlineParser.parseFull` 供转换器使用。
