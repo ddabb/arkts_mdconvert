@@ -271,3 +271,12 @@ entry/src/main/ets/
   2. `hdc file recv /data/app/el2/100/base/com.ddabb.mdconvert/files/<file> <本地目录>`
   3. `py -3 scripts/cross_check.py <本地目录>`
 - M1 剩余：应用内 UI 接入转换入口。
+
+### M2 DOCX 生成器完成（2026-10-20）
+- zip writer `core/ZipWriter.ets`：CRC32 查表（0xEDB88320 反射）+ UTF-8 编码器（代理对合并、孤立代理降级 U+FFFD）+ STORE 模式组包（Local Header 30B + Central Directory 46B + EOCD 22B，UTF-8 名字标志 0x0800，固定 DOS 日期 0x0021），零系统 zip API 依赖。
+- OOXML 生成器 `core/DocxOut.ets`（MdToDocx，parseFull 直转）：最小六部件（[Content_Types].xml / _rels/.rels / document / styles / numbering / document.xml.rels）；样式映射 h1-h6 → Word 内置 Heading 1-6（导航窗格可用）+ MdcCode（Consolas+浅底纹+NSimSun）/MdcQuote/ListParagraph(contextualSpacing)/TableGrid；编号：无序共享 numId=1（•◦▪ 六层），有序每列表独立 numId 2+（lvlOverride startOverride 重启、嵌套 ilvl 递进）；表格 tblGrid+tblHeader+表头底纹+列对齐 jc+表后隔离段；超链接外部关系（URL 去重、rId3+、0563C1+下划线）；图片 P0 文本占位 `[alt](url)`；hr → pBdr 底边框；软换行渲染为空格；XML 转义（<>& + 属性级 quot/apos/控制字符 U+FFFD 兜底）；A4 sectPr（11906×16838）。
+- 新增 `mdDocxTest` 32 用例：EOCD/Central/Local 结构偏移断言、STORE 标志、CRC 复算、UTF-8 往返（CJK/emoji/孤立代理）、样式/编号/超链接/表格/代码块/转义/软换行黄金断言、rels 去重、空文档。测试揪出并修正 3 处测试侧断言缺陷（Local Header 字段偏移错位、lvlOverride 标签名误写、表后空段形态）。
+- 黄金 dump 扩展 `mdc_sample.docx`（fileIo 写 bytes，六件套→沙箱）；`scripts/docx_check.py`：zipfile.testzip CRC + minidom 六部件良构 + STORE/0x0800 标志 + hyperlink r:id ⊆ rels + 关系/样式/编号/正文探针——**DOCX_CHECK PASS**；cross_check 复验 PASS（检查器修正：链接 URL 位于 rels 而非 document 正文）。
+- 对账运行协议扩展：`hdc file recv` 新增 mdc_sample.docx → `py -3 scripts/docx_check.py <目录>`。
+- 全套回归 **165 用例模拟器全绿**（Tests run: 165, Failure: 0, Error: 0）。
+- M2 剩余（人工步骤）：Word 2016+/WPS 桌面/WPS 移动实测矩阵（M2 验收门槛）。

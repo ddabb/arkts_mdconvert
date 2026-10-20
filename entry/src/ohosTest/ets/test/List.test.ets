@@ -11,6 +11,7 @@ import mdCoreTest from './MdCore.test';
 import mdInlineTest from './MdInline.test';
 import mdJsonTest from './MdJson.test';
 import mdYamlTest from './MdYaml.test';
+import mdDocxTest from './MdDocx.test';
 import mdGoldenDumpTest from './MdGoldenDump.test';
 
 export default function testsuite() {
@@ -19,5 +20,6 @@ export default function testsuite() {
   mdInlineTest();
   mdJsonTest();
   mdYamlTest();
+  mdDocxTest();
   mdGoldenDumpTest();
 }

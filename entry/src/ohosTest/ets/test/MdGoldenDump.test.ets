@@ -4,6 +4,7 @@ import { abilityDelegatorRegistry } from '@kit.TestKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { MdToJson } from '../../../main/ets/core/MdJsonOut';
 import { MdToYaml } from '../../../main/ets/core/MdYamlOut';
+import { MdToDocx } from '../../../main/ets/core/DocxOut';
 
 const GOLDEN_LINES: string[] = [
   '# MdConvert 对账样本',
@@ -58,6 +59,11 @@ export default function mdGoldenDumpTest() {
       write('mdc_tree.json', MdToJson.tree(md));
       write('mdc_flat.yaml', MdToYaml.flat(md));
       write('mdc_tree.yaml', MdToYaml.tree(md));
+      const docxBytes: Uint8Array = MdToDocx.generate(md);
+      const docxFile = fileIo.openSync(dir + '/mdc_sample.docx',
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      fileIo.writeSync(docxFile.fd, docxBytes.buffer);
+      fileIo.closeSync(docxFile);
       expect(true).assertTrue();
     });
   });
