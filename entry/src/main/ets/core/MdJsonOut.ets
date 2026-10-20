@@ -367,8 +367,8 @@ export class MdToJson {
       return new JObj().put('type', new JStr('code')).put('text', new JStr(node.text));
     }
     if (node instanceof MdLink) {
-      return new JObj().put('type', new JStr('link')).put('url', new JStr(node.url))
-        .put('inline', MdToJson.inlinesToJ(node.inline));
+      return new JObj().put('type', new JStr('link')).put('inline', MdToJson.inlinesToJ(node.inline))
+        .put('url', new JStr(node.url));
     }
     if (node instanceof MdImage) {
       return new JObj().put('type', new JStr('image')).put('alt', new JStr(node.alt))

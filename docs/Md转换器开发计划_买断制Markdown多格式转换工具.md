@@ -259,3 +259,15 @@ entry/src/main/ets/
 - YAML 序列化器 `core/MdYamlOut.ets`：自研 YWriter（复用 JVal 树）——plain/双引号标量自动判定（指示符/`: `/` #`/布尔数字字面量等）、多行文本字面块标量（`|-`/`|`/`|+` chomping）、序列 `- ` 缩进布局。
 - 新增 `mdJsonTest` 23 用例 + `mdYamlTest` 19 用例；全套 132 用例模拟器全绿（Tests run: 132, Pass: 132, Failure: 0）。
 - 待办：M1 收尾（应用内 UI 接入转换入口）与 Python 对账脚本（需 Python 环境）。
+
+### M1 交叉对账完成（2026-10-20）
+- Python 环境：`py -3`（3.11.0）+ PyYAML 6.0.3（pip 安装）。
+- 沙箱导出协议：`mdGoldenDumpTest`（ohosTest）经 `getAppContext().filesDir` 将黄金样本五件套（source.md / flat.json / tree.json / flat.yaml / tree.yaml）写入 `/data/app/el2/100/base/com.ddabb.mdconvert/files/`，`hdc file recv` 拉取至本机。
+- 对账脚本 `scripts/cross_check.py`：① `yaml.safe_load == json.loads` 深度相等（平铺/标题树双模式，双向验证两套 emitter）；② 块/行内结构断言（标题层级、代码块+行内码、表格对齐与表头、有序/无序列表及序号、引用、hr）；③ 内容探针（URL 含括号、图片、CJK、行内样式）；④ Python 独立实现的 alnum/CJK 无损子序列；⑤ 标题树 sections 结构——**CROSS_CHECK PASS**。
+- 对账揪出并修正两处：JSON `link` 键序改为 inline 文本先于 url（序列化产物内保持源顺序无损语义）；YAML 引号规则加固（`:`+数字防 sexagesimal 误解析、布尔/空值大小写变体）。
+- 全套回归 133 用例模拟器全绿（Tests run: 133, Pass: 133, Failure: 0）。M1 验收门槛达成：黄金 ≥40（实际 133）+ Python yaml 对账绿。
+- 对账运行协议：
+  1. `hdc shell aa test -b com.ddabb.mdconvert -m entry_test -s unittest OpenHarmonyTestRunner -s class mdGoldenDumpTest -s timeout 15000`
+  2. `hdc file recv /data/app/el2/100/base/com.ddabb.mdconvert/files/<file> <本地目录>`
+  3. `py -3 scripts/cross_check.py <本地目录>`
+- M1 剩余：应用内 UI 接入转换入口。

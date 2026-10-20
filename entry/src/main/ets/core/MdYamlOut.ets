@@ -182,8 +182,14 @@ export class YWriter {
     if (s.indexOf(': ') >= 0 || s.indexOf(' #') >= 0 || s.charAt(s.length - 1) == ':') {
       return true;
     }
-    if (s == 'true' || s == 'false' || s == 'null' || s == 'yes' || s == 'no' ||
-      s == 'on' || s == 'off' || s == '~') {
+    for (let i: number = 0; i < s.length - 1; i += 1) {
+      if (s.charAt(i) == ':' && s.charCodeAt(i + 1) >= 48 && s.charCodeAt(i + 1) <= 57) {
+        return true;
+      }
+    }
+    const low: string = s.toLowerCase();
+    if (low == 'true' || low == 'false' || low == 'null' || low == 'yes' || low == 'no' ||
+      low == 'on' || low == 'off' || s == '~') {
       return true;
     }
     const c0: number = s.charCodeAt(0);
