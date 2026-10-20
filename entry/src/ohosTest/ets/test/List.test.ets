@@ -7,7 +7,9 @@
  *  - 各计划的核心套件（mathCoreTest / pixelCoreTest / mdCoreTest）随 M0+ 批次注册进本表。
  */
 import abilityTest from './Ability.test';
+import mdCoreTest from './MdCore.test';
 
 export default function testsuite() {
   abilityTest();
+  mdCoreTest();
 }
