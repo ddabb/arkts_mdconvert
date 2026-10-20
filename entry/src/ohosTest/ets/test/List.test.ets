@@ -9,9 +9,13 @@
 import abilityTest from './Ability.test';
 import mdCoreTest from './MdCore.test';
 import mdInlineTest from './MdInline.test';
+import mdJsonTest from './MdJson.test';
+import mdYamlTest from './MdYaml.test';
 
 export default function testsuite() {
   abilityTest();
   mdCoreTest();
   mdInlineTest();
+  mdJsonTest();
+  mdYamlTest();
 }

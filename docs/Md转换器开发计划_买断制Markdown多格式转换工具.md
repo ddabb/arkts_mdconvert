@@ -253,3 +253,9 @@ entry/src/main/ets/
 - 行内解析器 `core/MdInlineParser.ets`：粗体/斜体（含 *** 粗斜体、_ 词内抑制）/删除线/行内代码（双反引号、空白压缩）/链接（平衡括号 URL、嵌套粗体文本）/图片（含链接内图片）/ASCII 标点转义，嵌套递归，未闭合标记字面保留；组合入口 `parseFull`（块级+行内，覆盖标题/段落/列表/引用/表格单元格）。
 - 新增 `mdInlineTest` 38 用例（黄金结构断言 + 5 组无损 sweep，含 CJK 混排链接）；全套 91 用例模拟器全绿（Tests run: 91, Pass: 91, Failure: 0）。
 - 待办：JSON/YAML 序列化器 + 交叉对账。
+
+### M1 进展二（2026-10-20）
+- JSON 序列化器 `core/MdJsonOut.ets`：JVal 类族（JObj/JArr/JStr/JNum/JBool）+ 自研 JWriter（2 空格缩进、控制字符/引号/换行转义）；MdDoc→JVal 双模式——平铺（blocks 数组）与标题树（sections 嵌套 + preamble blocks），覆盖全部块型与行内型。
+- YAML 序列化器 `core/MdYamlOut.ets`：自研 YWriter（复用 JVal 树）——plain/双引号标量自动判定（指示符/`: `/` #`/布尔数字字面量等）、多行文本字面块标量（`|-`/`|`/`|+` chomping）、序列 `- ` 缩进布局。
+- 新增 `mdJsonTest` 23 用例 + `mdYamlTest` 19 用例；全套 132 用例模拟器全绿（Tests run: 132, Pass: 132, Failure: 0）。
+- 待办：M1 收尾（应用内 UI 接入转换入口）与 Python 对账脚本（需 Python 环境）。
