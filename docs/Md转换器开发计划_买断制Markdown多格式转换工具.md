@@ -250,5 +250,6 @@ entry/src/main/ets/
 - 已知边界（内容无损前提下的 M0 简化，后续版本按需增强）：Setext 标题、4 空格缩进代码块降级为段落；有序列表序号原样保留。
 
 ### M1 进行中（2026-10-20 启动）
-- 行内解析器 `core/MdInlineParser.ets`：粗体/斜体/删除线/行内代码/链接/图片/转义，嵌套递归，未闭合标记字面保留。
-- 新增 `mdInlineTest` 黄金用例集；`MdParser.parse` 保持纯块级，组合入口 `MdInlineParser.parseFull` 供转换器使用。
+- 行内解析器 `core/MdInlineParser.ets`：粗体/斜体（含 *** 粗斜体、_ 词内抑制）/删除线/行内代码（双反引号、空白压缩）/链接（平衡括号 URL、嵌套粗体文本）/图片（含链接内图片）/ASCII 标点转义，嵌套递归，未闭合标记字面保留；组合入口 `parseFull`（块级+行内，覆盖标题/段落/列表/引用/表格单元格）。
+- 新增 `mdInlineTest` 38 用例（黄金结构断言 + 5 组无损 sweep，含 CJK 混排链接）；全套 91 用例模拟器全绿（Tests run: 91, Pass: 91, Failure: 0）。
+- 待办：JSON/YAML 序列化器 + 交叉对账。

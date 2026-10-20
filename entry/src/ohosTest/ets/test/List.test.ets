@@ -8,8 +8,10 @@
  */
 import abilityTest from './Ability.test';
 import mdCoreTest from './MdCore.test';
+import mdInlineTest from './MdInline.test';
 
 export default function testsuite() {
   abilityTest();
   mdCoreTest();
+  mdInlineTest();
 }

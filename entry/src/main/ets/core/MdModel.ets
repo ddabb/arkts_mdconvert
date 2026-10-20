@@ -40,6 +40,58 @@ export class MdText extends MdInline {
   }
 }
 
+export class MdBold extends MdInline {
+  inline: MdInline[];
+  constructor(inline: MdInline[]) {
+    super(MdInlineKind.Bold);
+    this.inline = inline;
+  }
+}
+
+export class MdItalic extends MdInline {
+  inline: MdInline[];
+  constructor(inline: MdInline[]) {
+    super(MdInlineKind.Italic);
+    this.inline = inline;
+  }
+}
+
+export class MdStrike extends MdInline {
+  inline: MdInline[];
+  constructor(inline: MdInline[]) {
+    super(MdInlineKind.Strike);
+    this.inline = inline;
+  }
+}
+
+export class MdInlineCode extends MdInline {
+  readonly text: string;
+  constructor(text: string) {
+    super(MdInlineKind.Code);
+    this.text = text;
+  }
+}
+
+export class MdLink extends MdInline {
+  readonly url: string;
+  readonly inline: MdInline[];
+  constructor(url: string, inline: MdInline[]) {
+    super(MdInlineKind.Link);
+    this.url = url;
+    this.inline = inline;
+  }
+}
+
+export class MdImage extends MdInline {
+  readonly alt: string;
+  readonly url: string;
+  constructor(alt: string, url: string) {
+    super(MdInlineKind.Image);
+    this.alt = alt;
+    this.url = url;
+  }
+}
+
 export class MdBlock {
   readonly kind: MdBlockKind;
   constructor(kind: MdBlockKind) {
@@ -56,7 +108,7 @@ export class MdDoc {
 
 export class MdHeading extends MdBlock {
   readonly level: number;
-  readonly inline: MdInline[];
+  inline: MdInline[];
   constructor(level: number, inline: MdInline[]) {
     super(MdBlockKind.Heading);
     this.level = level;
@@ -65,7 +117,7 @@ export class MdHeading extends MdBlock {
 }
 
 export class MdPara extends MdBlock {
-  readonly inline: MdInline[];
+  inline: MdInline[];
   constructor(inline: MdInline[]) {
     super(MdBlockKind.Para);
     this.inline = inline;
@@ -120,7 +172,7 @@ export class MdList extends MdBlock {
 }
 
 export class MdTableCell {
-  readonly inline: MdInline[];
+  inline: MdInline[];
   constructor(inline: MdInline[]) {
     this.inline = inline;
   }
@@ -140,6 +192,20 @@ export function collectInlineText(inlines: MdInline[], parts: string[]): void {
   for (const node of inlines) {
     if (node instanceof MdText) {
       parts.push(node.text);
+    } else if (node instanceof MdInlineCode) {
+      parts.push(node.text);
+    } else if (node instanceof MdBold) {
+      collectInlineText(node.inline, parts);
+    } else if (node instanceof MdItalic) {
+      collectInlineText(node.inline, parts);
+    } else if (node instanceof MdStrike) {
+      collectInlineText(node.inline, parts);
+    } else if (node instanceof MdLink) {
+      collectInlineText(node.inline, parts);
+      parts.push(node.url);
+    } else if (node instanceof MdImage) {
+      parts.push(node.alt);
+      parts.push(node.url);
     }
   }
 }
