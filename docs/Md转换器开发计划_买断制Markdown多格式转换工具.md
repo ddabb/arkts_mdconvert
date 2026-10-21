@@ -280,3 +280,12 @@ entry/src/main/ets/
 - 对账运行协议扩展：`hdc file recv` 新增 mdc_sample.docx → `py -3 scripts/docx_check.py <目录>`。
 - 全套回归 **165 用例模拟器全绿**（Tests run: 165, Failure: 0, Error: 0）。
 - M2 剩余（人工步骤）：Word 2016+/WPS 桌面/WPS 移动实测矩阵（M2 验收门槛）。
+
+### M3 思维导图核心完成（2026-10-21）
+- 树构建 `core/MindmapTree.ets`（MindNode + MindTreeBuilder）：复用 splitSections 标题树；标题即根条件（pre 空 + 唯一根 + H1），否则回退根「文档大纲」；块映射——段落/列表项取首行、代码块 `[lang] 首行`、表格 `表格：表头` + 数据行子节点、引用打平、hr 跳过、空列表项跳过（嵌套兜底「条目」）；行内纯文本剥离 URL（链接取锚文本、图片取 alt）；同级折叠 cap（>maxChildren 保留 max-1 + 「…还有 N 项」，≤0 不折叠，.mm/.opml 用 0、渲染用 12）。
+- 布局纯函数 `core/MindmapLayout.ets`（MindMetrics 抽象/MindMetricsFixed/MindRect/MindLayoutItem/MindLayout + MindmapLayout.layout）：左右分形 tidy tree——根子节点 ceil(n/2) 前右后左、按 side+depth 列宽、父纵向居中于首末子中心、根居内容带（常量 NODE_H 36/PAD_X 16/MIN_W 40/GAP_Y 12/GAP_X 48/ROOT_GAP 64/MARGIN 24）；产物前序 items（node/depth/side/parent/children/rect）+ 画布 width/height。
+- 序列化 `core/MmOpmlOut.ets`：MdToMm（FreeMind `<map version="1.0.1">` + node TEXT + 一级 POSITION right/left，复用 escAttr）与 MdToOpml（XML 声明 + opml 2.0 + head title=root 文本 + body outline text=）。
+- 新增三套件：`mdMindTreeTest` 18 用例（空文档回退/单 H1 根/多 H1 回退/行内剥离 URL/首行/嵌套列表/代码标签/表格行/引用打平/hr/折叠/兜底标签）；`mdMindLayoutTest` 8 用例（黄金坐标快照 6 节点逐矩形、仅根/单子右侧/侧分/深链单调、**随机 200 棵树两两不相交 + 父居中不变量**、531 节点性能树 <1000ms 且不相交）；`mdMmOpmlTest` 10 用例（结构/计数/POSITION 序列/属性转义/自闭合/嵌套）。测试揪出并修正 5 处测试侧缺陷（tree4 节点数误计 6≠5、一级节点漏计 POSITION 属性、MIN_W 用例度量选错、不相交断言逐对 expect 导致性能用例 74s——合并为计数断言）。
+- 黄金 dump 扩展 `mdc_sample.mm`/`mdc_sample.opml`（沙箱八件套）；`scripts/mm_check.py`：minidom 双文件良构 + 15 节点文本全集 + 一级 POSITION 序列 right,right,left,left + head title——**MM_CHECK PASS**；cross_check/docx_check 复验 PASS。
+- 全套回归 **201 用例模拟器全绿**（Tests run: 201, Failure: 0, Error: 0）。
+- M3 剩余（下批）：PngRender（@ohos.graphics.drawing 三主题）+ 画布预览页 + XMind 导入实测（人工）。

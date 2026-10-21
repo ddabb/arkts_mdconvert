@@ -13,6 +13,9 @@ import mdJsonTest from './MdJson.test';
 import mdYamlTest from './MdYaml.test';
 import mdDocxTest from './MdDocx.test';
 import mdGoldenDumpTest from './MdGoldenDump.test';
+import mdMindTreeTest from './MdMindTree.test';
+import mdMindLayoutTest from './MdMindLayout.test';
+import mdMmOpmlTest from './MdMmOpml.test';
 
 export default function testsuite() {
   abilityTest();
@@ -22,4 +25,7 @@ export default function testsuite() {
   mdYamlTest();
   mdDocxTest();
   mdGoldenDumpTest();
+  mdMindTreeTest();
+  mdMindLayoutTest();
+  mdMmOpmlTest();
 }

@@ -5,6 +5,7 @@ import { fileIo } from '@kit.CoreFileKit';
 import { MdToJson } from '../../../main/ets/core/MdJsonOut';
 import { MdToYaml } from '../../../main/ets/core/MdYamlOut';
 import { MdToDocx } from '../../../main/ets/core/DocxOut';
+import { MdToMm, MdToOpml } from '../../../main/ets/core/MmOpmlOut';
 
 const GOLDEN_LINES: string[] = [
   '# MdConvert 对账样本',
@@ -64,6 +65,8 @@ export default function mdGoldenDumpTest() {
         fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
       fileIo.writeSync(docxFile.fd, docxBytes.buffer);
       fileIo.closeSync(docxFile);
+      write('mdc_sample.mm', MdToMm.mm(md));
+      write('mdc_sample.opml', MdToOpml.opml(md));
       expect(true).assertTrue();
     });
   });
