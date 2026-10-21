@@ -79,6 +79,29 @@ struct Index {
         .borderRadius(16)
         .alignItems(HorizontalAlign.Start)
 
+        // M3 功能卡：思维导图预览入口
+        Column({ space: 12 }) {
+          Text($r('app.string.mindmap_preview_title'))
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.primary_text'))
+          Text($r('app.string.mindmap_entry_desc'))
+            .fontSize(13)
+            .fontColor($r('app.color.secondary_text'))
+          Button($r('app.string.mindmap_open_preview'))
+            .backgroundColor($r('app.color.brand'))
+            .fontColor(Color.White)
+            .onClick(() => {
+              const opt: RouterOptions = { url: 'pages/MindmapPreviewPage' };
+              this.getUIContext().getRouter().pushUrl(opt);
+            })
+        }
+        .width('90%')
+        .padding(20)
+        .backgroundColor($r('app.color.card_background'))
+        .borderRadius(16)
+        .alignItems(HorizontalAlign.Start)
+
         Text($r('app.string.plan_note'))
           .fontSize(12)
           .fontColor($r('app.color.hint_text'))

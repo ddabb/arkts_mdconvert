@@ -6,6 +6,8 @@ import { MdToJson } from '../../../main/ets/core/MdJsonOut';
 import { MdToYaml } from '../../../main/ets/core/MdYamlOut';
 import { MdToDocx } from '../../../main/ets/core/DocxOut';
 import { MdToMm, MdToOpml } from '../../../main/ets/core/MmOpmlOut';
+import { MindTheme } from '../../../main/ets/core/MindmapTheme';
+import { PngRender } from '../../../main/ets/core/PngRender';
 
 const GOLDEN_LINES: string[] = [
   '# MdConvert 对账样本',
@@ -44,7 +46,7 @@ const GOLDEN_LINES: string[] = [
 
 export default function mdGoldenDumpTest() {
   describe('mdGoldenDumpTest', () => {
-    it('dumpGoldenOutputs', 0, () => {
+    it('dumpGoldenOutputs', 0, async () => {
       const md: string = GOLDEN_LINES.join('\n');
       const delegator = abilityDelegatorRegistry.getAbilityDelegator();
       const dir: string = delegator.getAppContext().filesDir;
@@ -67,6 +69,11 @@ export default function mdGoldenDumpTest() {
       fileIo.closeSync(docxFile);
       write('mdc_sample.mm', MdToMm.mm(md));
       write('mdc_sample.opml', MdToOpml.opml(md));
+      const pngBytes: Uint8Array = await PngRender.renderBytes(md, MindTheme.fresh(), 12);
+      const pngFile = fileIo.openSync(dir + '/mdc_sample.png',
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      fileIo.writeSync(pngFile.fd, pngBytes.buffer);
+      fileIo.closeSync(pngFile);
       expect(true).assertTrue();
     });
   });

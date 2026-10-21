@@ -289,3 +289,13 @@ entry/src/main/ets/
 - 黄金 dump 扩展 `mdc_sample.mm`/`mdc_sample.opml`（沙箱八件套）；`scripts/mm_check.py`：minidom 双文件良构 + 15 节点文本全集 + 一级 POSITION 序列 right,right,left,left + head title——**MM_CHECK PASS**；cross_check/docx_check 复验 PASS。
 - 全套回归 **201 用例模拟器全绿**（Tests run: 201, Failure: 0, Error: 0）。
 - M3 剩余（下批）：PngRender（@ohos.graphics.drawing 三主题）+ 画布预览页 + XMind 导入实测（人工）。
+
+### M3 渲染与预览完成（2026-10-21）
+- 主题 `core/MindmapTheme.ets`（纯数据 MindTheme）：清爽/手账/暗夜三套（bg/根填充/根文本/节点填充/节点文本/节点描边/六色分支环取 + branchColor(depth)），十六进制色串存储、PngRender 侧转 common2D.Color。
+- 渲染 `core/PngRender.ets`（MindRenderResult + PngRender）：@kit.ArkGraphics2D drawing 位图链路——RenderMetrics 适配 MindMetrics（drawing.Font.measureText(text, TEXT_ENCODING_UTF8)，字号 16 + FontEdging.ANTI_ALIAS）→ MindmapLayout 布局 → image.createPixelMap(RGBA_8888) → new drawing.Canvas(pixelMap) → 背景/贝塞尔连线（Path.cubicTo，midX 双控点，深度分支色）/圆角节点（RoundRect，根 18 普通节点 10）/文本（TextBlob.makeFromString + drawTextBlob，FontMetrics ascent/descent 垂直居中）→ ImagePacker.packToData PNG；**4K 上限**（MAX_SIDE 4096，超限 canvas.scale 整体缩放）；render/renderBytes/toPngBytes 三入口（像素图保留给预览、字节流给导出）。
+- 预览页 `pages/MindmapPreviewPage.ets`：内置示例文档渲染 + 三主题 chips 切换（Image 展示 PixelMap + Pinch/Pan 手势缩放平移 0.5–5x + 复位）+ 导出按钮（packToData → fileIo 写 files/mdc_export.png → toast 含路径）；Index 首页新增 M3 功能卡入口（getUIContext().getRouter().pushUrl）；UI 字符串 base/en 双语 13 键（含 %s 占位符）。
+- 新增 `mdPngRenderTest` 7 用例（hypium async it）：PNG 魔数/IHDR 尺寸==结果尺寸/空文档（根兜底 1 节点）/三主题魔数/主题背景像素采样（fresh R=248、dark R=15、alpha 255）/4K 封顶（631 节点 → 201×4096，scale 0.284）/531 节点性能。测试揪出并修正 1 处测试侧缺陷（仅根树高 84=NODE_H+2×MARGIN，误断 ≥88）。
+- 黄金 dump 扩展 `mdc_sample.png`（沙箱九件套，fresh 主题 1499×276）；`scripts/png_check.py`：纯 stdlib（struct/zlib）PNG 结构校验——签名/逐 chunk CRC32/IHDR 首位/IEND 末位无尾垃圾/位深 8/色彩类型 6（RGBA）/IDAT 解压尺寸==h×(1+w×4)/尺寸≤4096——**PNG_CHECK PASS**；cross_check/docx_check/mm_check 复验 PASS。
+- 性能实测（模拟器）：**531 节点 render=138ms + pack=320ms = 458ms**（440×4096，497KB PNG），满足 M3 验收「500 节点 <1s」。
+- 全套回归 **208 用例模拟器全绿**（Tests run: 208, Failure: 0, Error: 0）。
+- M3 剩余（人工）：XMind 导入 .mm 实测（验收门槛）。

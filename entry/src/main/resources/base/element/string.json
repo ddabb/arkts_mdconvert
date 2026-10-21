@@ -67,6 +67,50 @@
     {
       "name": "mod_offline",
       "value": "本地离线零上传"
+    },
+    {
+      "name": "mindmap_preview_title",
+      "value": "思维导图预览"
+    },
+    {
+      "name": "mindmap_entry_desc",
+      "value": "树构建 · 左右分形布局 · 三主题 PNG · .mm / .opml"
+    },
+    {
+      "name": "mindmap_open_preview",
+      "value": "打开预览"
+    },
+    {
+      "name": "mindmap_theme_fresh",
+      "value": "清爽"
+    },
+    {
+      "name": "mindmap_theme_journal",
+      "value": "手账"
+    },
+    {
+      "name": "mindmap_theme_dark",
+      "value": "暗夜"
+    },
+    {
+      "name": "mindmap_export_png",
+      "value": "导出 PNG"
+    },
+    {
+      "name": "mindmap_export_done",
+      "value": "已导出：%s"
+    },
+    {
+      "name": "mindmap_reset_view",
+      "value": "复位视图"
+    },
+    {
+      "name": "mindmap_demo_note",
+      "value": "内置示例文档，真实内容转换将在 M4 接入"
+    },
+    {
+      "name": "mindmap_rendering",
+      "value": "渲染中…"
     }
   ]
 }

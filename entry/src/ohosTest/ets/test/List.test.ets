@@ -16,6 +16,7 @@ import mdGoldenDumpTest from './MdGoldenDump.test';
 import mdMindTreeTest from './MdMindTree.test';
 import mdMindLayoutTest from './MdMindLayout.test';
 import mdMmOpmlTest from './MdMmOpml.test';
+import mdPngRenderTest from './MdPngRender.test';
 
 export default function testsuite() {
   abilityTest();
@@ -28,4 +29,5 @@ export default function testsuite() {
   mdMindTreeTest();
   mdMindLayoutTest();
   mdMmOpmlTest();
+  mdPngRenderTest();
 }

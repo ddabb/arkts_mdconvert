@@ -67,6 +67,50 @@
     {
       "name": "mod_offline",
       "value": "Local offline, zero upload"
+    },
+    {
+      "name": "mindmap_preview_title",
+      "value": "Mindmap Preview"
+    },
+    {
+      "name": "mindmap_entry_desc",
+      "value": "Tree build · tidy layout · 3-theme PNG · .mm / .opml"
+    },
+    {
+      "name": "mindmap_open_preview",
+      "value": "Open preview"
+    },
+    {
+      "name": "mindmap_theme_fresh",
+      "value": "Fresh"
+    },
+    {
+      "name": "mindmap_theme_journal",
+      "value": "Journal"
+    },
+    {
+      "name": "mindmap_theme_dark",
+      "value": "Dark"
+    },
+    {
+      "name": "mindmap_export_png",
+      "value": "Export PNG"
+    },
+    {
+      "name": "mindmap_export_done",
+      "value": "Exported: %s"
+    },
+    {
+      "name": "mindmap_reset_view",
+      "value": "Reset view"
+    },
+    {
+      "name": "mindmap_demo_note",
+      "value": "Built-in demo document; real conversion lands in M4"
+    },
+    {
+      "name": "mindmap_rendering",
+      "value": "Rendering…"
     }
   ]
 }
