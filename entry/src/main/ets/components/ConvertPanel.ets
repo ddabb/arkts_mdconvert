@@ -252,6 +252,8 @@ export struct ConvertPanel {
     try {
       HistoryStore.add(ctx.filesDir,
         HistoryStore.record(this.fileName, this.fmtKey(), this.modeKey(), src, Date.now()));
+      const seq: number | undefined = AppStorage.get<number>('mdc.historySeq');
+      AppStorage.setOrCreate('mdc.historySeq', (seq ?? 0) + 1);
       this.loadRecents();
     } catch (err) {
     }

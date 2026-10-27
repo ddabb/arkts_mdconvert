@@ -4,9 +4,14 @@ import { HistoryRecord, HistoryStore } from '../core/HistoryStore';
 @Component
 export struct HistoryPanel {
   @State records: HistoryRecord[] = [];
+  @StorageProp('mdc.historySeq') @Watch('onHistoryChanged') historySeq: number = 0;
   requestConvert: () => void = () => {};
 
   aboutToAppear(): void {
+    this.reload();
+  }
+
+  private onHistoryChanged(): void {
     this.reload();
   }
 
