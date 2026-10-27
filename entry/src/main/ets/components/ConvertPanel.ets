@@ -36,7 +36,8 @@ export struct ConvertPanel {
   @State fmtIdx: number = 0;
   @State treeMode: boolean = true;
   @State resultText: string = '';
-  @State docxBytes: Uint8Array | undefined = undefined;
+  @State docxKb: number = 0;
+  private docxBytes: Uint8Array | undefined = undefined;
   @State previewTab: number = 0;
   @State outlineItems: OutlineItem[] = [];
   @State recents: RecentFile[] = [];
@@ -192,6 +193,7 @@ export struct ConvertPanel {
         this.mdText = text;
         this.resultText = '';
         this.docxBytes = undefined;
+        this.docxKb = 0;
         this.outlineItems = [];
       } catch (err) {
         this.toast($r('app.string.read_fail'));
@@ -221,6 +223,7 @@ export struct ConvertPanel {
     }
     this.resultText = '';
     this.docxBytes = undefined;
+    this.docxKb = 0;
     try {
       if (this.fmtIdx == 0) {
         this.resultText = this.treeMode ? MdToJson.tree(src) : MdToJson.flat(src);
@@ -231,7 +234,9 @@ export struct ConvertPanel {
       } else if (this.fmtIdx == 3) {
         this.resultText = MdToOpml.opml(src);
       } else {
-        this.docxBytes = MdToDocx.generate(src);
+        const bytes: Uint8Array = MdToDocx.generate(src);
+        this.docxBytes = bytes;
+        this.docxKb = Math.ceil(bytes.length / 1024);
       }
       this.recordHistory(src);
     } catch (err) {
@@ -342,6 +347,7 @@ export struct ConvertPanel {
     this.mdText = f.content;
     this.resultText = '';
     this.docxBytes = undefined;
+    this.docxKb = 0;
     this.outlineItems = [];
     this.previewTab = 0;
   }
@@ -470,6 +476,7 @@ export struct ConvertPanel {
                   this.fmtIdx = idx;
                   this.resultText = '';
                   this.docxBytes = undefined;
+                  this.docxKb = 0;
                 })
             }, (idx: number) => idx.toString())
           }
@@ -584,8 +591,8 @@ export struct ConvertPanel {
           .borderRadius(16)
           .alignItems(HorizontalAlign.Start)
         }
-        if (this.docxBytes !== undefined) {
-          Text($r('app.string.convert_docx_ready', Math.ceil(this.docxBytes.length / 1024)))
+        if (this.docxKb > 0) {
+          Text($r('app.string.convert_docx_ready', this.docxKb))
             .fontSize(13)
             .fontColor($r('app.color.success_green'))
             .padding({ left: 14, right: 14, top: 8, bottom: 8 })
