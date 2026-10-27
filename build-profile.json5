@@ -6,6 +6,7 @@
     "products": [
       {
         "name": "default",
+        "signingConfig": "default",
         "targetSdkVersion": "6.0.0(20)",
         "compatibleSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
@@ -18,6 +19,7 @@
       },
       {
         "name": "release",
+        "signingConfig": "release",
         "targetSdkVersion": "6.0.0(20)",
         "compatibleSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
@@ -35,6 +37,34 @@
       },
       {
         "name": "release"
+      }
+    ],
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "D:/keystore/debug.p12",
+          "storePassword": "0000001827AF0B42F6EF14106D98712D7E14800CFD32E180A6F1B6D09D96281D0845413D84A4D502",
+          "keyAlias": "debug",
+          "keyPassword": "00000018C227BBFE5BAC20D55AF86A903A150DB79D76DB4811265BEA6C3379C6796500D27A8B2809",
+          "signAlg": "SHA256withECDSA",
+          "profile": "D:/keystore/markdown转换器调试Debug.p7b",
+          "certpath": "D:/keystore/调试证书.cer"
+        }
+      },
+      {
+        "name": "release",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "D:/keystore/toolbox.p12",
+          "storePassword": "00000018210CB3F8DD51F5800A4240AA6ECC77D383EB3C87082F0E729BCE298C2E0F7FAA545EBA2A",
+          "keyAlias": "toolbox",
+          "keyPassword": "000000186B8712AF7DAACADBE213EC43B69E1CA85850C6B832D513C8793862A8BB7F311F79555009",
+          "signAlg": "SHA256withECDSA",
+          "profile": "D:/keystore/markdown转换器发布Release.p7b",
+          "certpath": "D:/keystore/发布证书.cer"
+        }
       }
     ]
   },
