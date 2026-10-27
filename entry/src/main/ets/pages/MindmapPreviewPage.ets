@@ -52,10 +52,10 @@ struct MindmapPreviewPage {
       this.isCustom = true;
       AppStorage.setOrCreate('mdc.mind.src', '');
     }
-    this.rerender();
+    this.requestRender();
   }
 
-  private rerender(): void {
+  private requestRender(): void {
     if (this.busy) {
       return;
     }
@@ -140,7 +140,7 @@ struct MindmapPreviewPage {
               .onClick(() => {
                 if (this.themeIdx != idx) {
                   this.themeIdx = idx;
-                  this.rerender();
+                  this.requestRender();
                 }
               })
           }, (theme: MindTheme) => theme.key)
