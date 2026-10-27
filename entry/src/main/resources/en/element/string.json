@@ -2,39 +2,27 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "Main module of MdConvert"
+      "value": "MdConvert main module"
     },
     {
       "name": "EntryAbility_desc",
-      "value": "MdConvert app entry"
+      "value": "MdConvert application entry"
     },
     {
       "name": "EntryAbility_label",
-      "value": "MdConvert"
+      "value": "MarkDown转换器"
     },
     {
       "name": "app_tagline",
-      "value": "Native Markdown multi-format converter"
+      "value": "Native HarmonyOS multi-format Markdown converter"
     },
     {
       "name": "buyout_note",
-      "value": "One-time purchase · No ads · No subscription"
+      "value": "Buy once · No ads · No subscription"
     },
     {
       "name": "offline_note",
-      "value": "No network permission · Fully offline"
-    },
-    {
-      "name": "scaffold_title",
-      "value": "M0 scaffold"
-    },
-    {
-      "name": "scaffold_desc",
-      "value": "Core modules land in batches per the dev plan. This is a placeholder home page."
-    },
-    {
-      "name": "plan_note",
-      "value": "Dev plan, milestones, and acceptance criteria live in docs/."
+      "value": "Zero network · Fully offline"
     },
     {
       "name": "version_label",
@@ -45,40 +33,76 @@
       "value": "v1.0.0"
     },
     {
-      "name": "mod_parser",
-      "value": "In-house controlled MD parser"
+      "name": "tab_convert",
+      "value": "Convert"
     },
     {
-      "name": "mod_json",
-      "value": "Convert to JSON / YAML"
+      "name": "tab_history",
+      "value": "History"
     },
     {
-      "name": "mod_docx",
-      "value": "Convert to Word (.docx)"
+      "name": "tab_settings",
+      "value": "Settings"
     },
     {
-      "name": "mod_mindmap",
-      "value": "Convert to mind map (PNG / .mm / .opml)"
+      "name": "dialog_cancel",
+      "value": "Cancel"
     },
     {
-      "name": "mod_batch",
-      "value": "Batch conversion"
+      "name": "dialog_ok",
+      "value": "OK"
     },
     {
-      "name": "mod_offline",
-      "value": "Local offline, zero upload"
+      "name": "history_empty",
+      "value": "No conversions yet"
+    },
+    {
+      "name": "history_clear",
+      "value": "Clear History"
+    },
+    {
+      "name": "history_clear_confirm",
+      "value": "Clear all conversion history?"
+    },
+    {
+      "name": "history_clear_done",
+      "value": "History cleared"
+    },
+    {
+      "name": "history_reconvert",
+      "value": "Reconvert"
+    },
+    {
+      "name": "history_pasted",
+      "value": "Pasted"
+    },
+    {
+      "name": "settings_dark_title",
+      "value": "Dark Mode"
+    },
+    {
+      "name": "settings_dark_note",
+      "value": "Follows the system dark / light setting"
+    },
+    {
+      "name": "settings_privacy_title",
+      "value": "Privacy"
+    },
+    {
+      "name": "settings_privacy_desc",
+      "value": "Zero network permission: conversion is fully local. Documents never leave your device."
+    },
+    {
+      "name": "settings_buyout_title",
+      "value": "Purchase"
+    },
+    {
+      "name": "settings_buyout_desc",
+      "value": "Buy once, no ads or subscriptions. Your Huawei ID is the proof of purchase; reinstall for free anytime."
     },
     {
       "name": "mindmap_preview_title",
-      "value": "Mindmap Preview"
-    },
-    {
-      "name": "mindmap_entry_desc",
-      "value": "Tree build · tidy layout · 3-theme PNG · .mm / .opml"
-    },
-    {
-      "name": "mindmap_open_preview",
-      "value": "Open preview"
+      "value": "Mind Map Preview"
     },
     {
       "name": "mindmap_theme_fresh",
@@ -98,19 +122,223 @@
     },
     {
       "name": "mindmap_export_done",
-      "value": "Exported: %s"
+      "value": "Saved: %s"
     },
     {
       "name": "mindmap_reset_view",
-      "value": "Reset view"
+      "value": "Reset View"
     },
     {
       "name": "mindmap_demo_note",
-      "value": "Built-in demo document; real conversion lands in M4"
+      "value": "Built-in demo document showcasing mind map rendering."
+    },
+    {
+      "name": "mindmap_custom_note",
+      "value": "Rendering content from the Convert tab."
     },
     {
       "name": "mindmap_rendering",
       "value": "Rendering…"
+    },
+    {
+      "name": "md_preview_title",
+      "value": "Markdown Preview"
+    },
+    {
+      "name": "md_preview_entry_desc",
+      "value": "Tables · Code highlight · Task lists · Quotes"
+    },
+    {
+      "name": "md_preview_copy_done",
+      "value": "Code copied"
+    },
+    {
+      "name": "md_preview_demo_note",
+      "value": "Built-in demo with tables, code blocks, and task lists."
+    },
+    {
+      "name": "convert_title",
+      "value": "Format Converter"
+    },
+    {
+      "name": "convert_desc",
+      "value": "MD → JSON · YAML · mind map .mm · outline .opml · Word"
+    },
+    {
+      "name": "convert_pick_file",
+      "value": "Choose .md File"
+    },
+    {
+      "name": "convert_paste_hint",
+      "value": "Or paste / edit Markdown below"
+    },
+    {
+      "name": "convert_paste_placeholder",
+      "value": "Paste Markdown here…"
+    },
+    {
+      "name": "convert_fmt_label",
+      "value": "Target Format"
+    },
+    {
+      "name": "convert_fmt_json",
+      "value": "JSON"
+    },
+    {
+      "name": "convert_fmt_yaml",
+      "value": "YAML"
+    },
+    {
+      "name": "convert_fmt_mm",
+      "value": "Mind map .mm"
+    },
+    {
+      "name": "convert_fmt_opml",
+      "value": "Outline .opml"
+    },
+    {
+      "name": "convert_fmt_docx",
+      "value": "Word .docx"
+    },
+    {
+      "name": "convert_mode_label",
+      "value": "Structure Mode"
+    },
+    {
+      "name": "convert_mode_flat",
+      "value": "Flat blocks"
+    },
+    {
+      "name": "convert_mode_tree",
+      "value": "Tree sections"
+    },
+    {
+      "name": "convert_run",
+      "value": "Convert"
+    },
+    {
+      "name": "convert_export",
+      "value": "Save As"
+    },
+    {
+      "name": "convert_share",
+      "value": "Share"
+    },
+    {
+      "name": "convert_share_fail",
+      "value": "Share failed"
+    },
+    {
+      "name": "convert_mind_preview",
+      "value": "Mind Map"
+    },
+    {
+      "name": "convert_source_tab",
+      "value": "Source"
+    },
+    {
+      "name": "convert_outline_tab",
+      "value": "Outline"
+    },
+    {
+      "name": "convert_outline_empty",
+      "value": "(empty document)"
+    },
+    {
+      "name": "convert_recent",
+      "value": "Recent"
+    },
+    {
+      "name": "convert_batch_entry",
+      "value": "Batch"
+    },
+    {
+      "name": "convert_mdpreview_entry",
+      "value": "MD Preview"
+    },
+    {
+      "name": "convert_result_title",
+      "value": "Result"
+    },
+    {
+      "name": "convert_docx_ready",
+      "value": "DOCX ready (%d KB)"
+    },
+    {
+      "name": "convert_chars",
+      "value": "%d chars"
+    },
+    {
+      "name": "convert_empty_input",
+      "value": "Choose a file or input content first"
+    },
+    {
+      "name": "convert_export_first",
+      "value": "Run conversion first"
+    },
+    {
+      "name": "convert_too_large",
+      "value": "Large file, only first %d chars loaded"
+    },
+    {
+      "name": "convert_fail",
+      "value": "Conversion failed"
+    },
+    {
+      "name": "read_fail",
+      "value": "Failed to read file"
+    },
+    {
+      "name": "export_done",
+      "value": "Saved: %s"
+    },
+    {
+      "name": "export_fail",
+      "value": "Save failed"
+    },
+    {
+      "name": "batch_title",
+      "value": "Batch Convert"
+    },
+    {
+      "name": "batch_desc",
+      "value": "Convert multiple .md files, export as ZIP"
+    },
+    {
+      "name": "batch_pick",
+      "value": "Select .md Files"
+    },
+    {
+      "name": "batch_run",
+      "value": "Convert & Export ZIP"
+    },
+    {
+      "name": "batch_empty",
+      "value": "No files selected"
+    },
+    {
+      "name": "batch_pending",
+      "value": "Pending"
+    },
+    {
+      "name": "batch_ok",
+      "value": "Done"
+    },
+    {
+      "name": "batch_fail",
+      "value": "Failed"
+    },
+    {
+      "name": "batch_summary",
+      "value": "%d done, %d failed"
+    },
+    {
+      "name": "batch_all_fail",
+      "value": "All conversions failed"
+    },
+    {
+      "name": "batch_file_count",
+      "value": "%d files selected"
     }
   ]
 }

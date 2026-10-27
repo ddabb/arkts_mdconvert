@@ -299,3 +299,16 @@ entry/src/main/ets/
 - 性能实测（模拟器）：**531 节点 render=138ms + pack=320ms = 458ms**（440×4096，497KB PNG），满足 M3 验收「500 节点 <1s」。
 - 全套回归 **208 用例模拟器全绿**（Tests run: 208, Failure: 0, Error: 0）。
 - M3 剩余（人工）：XMind 导入 .mm 实测（验收门槛）。
+
+### M4 App 壳与测试债完成（2026-10-27）
+- App 壳重构：Index 改底部 Tabs（转换|历史|设置，§5.1）；转换主面板 `components/ConvertPanel.ets`（原首页卡+ConvertPage 合并组件化，pages/ConvertPage.ets 删除）——DocumentViewPicker 文件选择/粘贴输入、最近 3 条去重、源码|大纲树预览切换、格式×模式 chips、转换/导出/分享、导图预览跳转、批量与 MD 渲染入口；转换成功写入历史。
+- 历史 `core/HistoryStore.ets`：HistoryRecord（id/time/chars/fmt/mode/fileName/content）行式编码（encodeURIComponent + \u001f 分隔）持久化 files/mdc_history.txt，cap 20 保留最新；`components/HistoryPanel.ets` 列表/重新转换（AppStorage 'mdc.pendingRecord' + pendingSeq 计数器触发 @Watch）/清空二次确认（AlertDialog）。
+- 大纲 `core/OutlineOut.ets`：buildOutline 纯函数——标题按级缩进、正文/列表/代码/表格嵌套于所属标题（sectionDepth 跟踪）、列表嵌套与有序前缀、代码 `[lang] 首行`、表格 `表格 r×c：表头`、引用打平、hr 跳过；TEXT_MAX 60 截断加省略号，OUTLINE_MAX 300 cap；渲染 `components/OutlineTree.ets`、`components/CodePreview.ets`（json/yaml/text 着色，400 行 cap）。
+- 分享/导出：结果写 cacheDir + fileUri.getUriFromPath + systemShare（docx→UTD WORD_DOC、文本→PLAIN_TEXT，ShareControllerOptions{PREVIEW, SINGLE}）；设置页 `components/SettingsPanel.ets`（深色跟随系统说明/隐私本地处理/买断说明/版本）。
+- 页面：`pages/MdPreviewPage.ets`（@luvi/lv-markdown-in 渲染 MD）、`pages/BatchConvertPage.ets`（批量）、`pages/MindmapPreviewPage.ets` 接真实源（AppStorage 'mdc.mind.src' 非空替代内置示例 + 提示语区分）；应用更名「MarkDown转换器」。
+- 新增 `mdHistoryTest` 13 用例（历史记录字段/编码解码回环 CJK+emoji+\u001f/坏行跳过/空/cap 保留最新 + 大纲标题嵌套深度/列表嵌套有序/代码引用表格/行内剥离/截断/空文档/cap）。测试揪出 2 处：1 处测试侧笔误（表格 2×2 误写 3×2）；1 处语义决策（正文段大纲深度——实现升级为嵌套于所属标题，测试锁定新语义）。
+- 全套回归 **221 用例模拟器全绿**（Tests run: 221, Failure: 0, Error: 0；Pura 90 模拟器 6.1.0.126/API24）；**双构建绿**（debug + release BUILD SUCCESSFUL，签名配置已入 build-profile.json5）。
+- 护栏：check_strings base/en 同步 **85 键 0 违规**（新增 27 键 tab_*/history_*/settings_*/dialog_* 等，清除脚手架死键）；code_stats 无 >900 行文件。
+- 环境记录：Huawei_Phone 模拟器镜像 API19 无法安装 API20 应用（code:9568297 older sdk version），Pura 90 镜像 API24（127.0.0.1:5557）可用；安装需等 bundle manager 就绪。
+- 遗留决策：@luvi/lv-markdown-in（含传递依赖 @cangjie-tpc/formula_hybrid、prism_hybrid）与 §10 零三方依赖原则冲突，去留待定夺（自研 MD 渲染替换或修订 §10）。
+- M4 剩余（人工）：M2 Word/WPS 实测矩阵、M3 XMind .mm 导入实测；M5（真机回归+上架素材+AGC 提审）未开始。

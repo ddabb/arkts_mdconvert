@@ -10,7 +10,7 @@
     },
     {
       "name": "EntryAbility_label",
-      "value": "Md转换器"
+      "value": "MarkDown转换器"
     },
     {
       "name": "app_tagline",
@@ -25,18 +25,6 @@
       "value": "零网络权限 · 全离线"
     },
     {
-      "name": "scaffold_title",
-      "value": "M0 工程脚手架"
-    },
-    {
-      "name": "scaffold_desc",
-      "value": "核心模块按开发计划分批落地，当前为占位首页。"
-    },
-    {
-      "name": "plan_note",
-      "value": "开发计划、里程碑与验收标准见 docs/ 目录。"
-    },
-    {
       "name": "version_label",
       "value": "版本"
     },
@@ -45,40 +33,76 @@
       "value": "v1.0.0"
     },
     {
-      "name": "mod_parser",
-      "value": "自研受控 MD 解析器"
+      "name": "tab_convert",
+      "value": "转换"
     },
     {
-      "name": "mod_json",
-      "value": "转 JSON / YAML"
+      "name": "tab_history",
+      "value": "历史"
     },
     {
-      "name": "mod_docx",
-      "value": "转 Word（.docx）"
+      "name": "tab_settings",
+      "value": "设置"
     },
     {
-      "name": "mod_mindmap",
-      "value": "转思维导图（PNG / .mm / .opml）"
+      "name": "dialog_cancel",
+      "value": "取消"
     },
     {
-      "name": "mod_batch",
-      "value": "批量转换"
+      "name": "dialog_ok",
+      "value": "确定"
     },
     {
-      "name": "mod_offline",
-      "value": "本地离线零上传"
+      "name": "history_empty",
+      "value": "还没有转换记录"
+    },
+    {
+      "name": "history_clear",
+      "value": "清空历史"
+    },
+    {
+      "name": "history_clear_confirm",
+      "value": "确定清空全部转换历史？"
+    },
+    {
+      "name": "history_clear_done",
+      "value": "历史已清空"
+    },
+    {
+      "name": "history_reconvert",
+      "value": "重新转换"
+    },
+    {
+      "name": "history_pasted",
+      "value": "粘贴内容"
+    },
+    {
+      "name": "settings_dark_title",
+      "value": "深色模式"
+    },
+    {
+      "name": "settings_dark_note",
+      "value": "跟随系统深浅色显示设置"
+    },
+    {
+      "name": "settings_privacy_title",
+      "value": "隐私"
+    },
+    {
+      "name": "settings_privacy_desc",
+      "value": "零网络权限：转换全程本地进行，文档不出手机、零上传。"
+    },
+    {
+      "name": "settings_buyout_title",
+      "value": "买断说明"
+    },
+    {
+      "name": "settings_buyout_desc",
+      "value": "一次买断，无广告、无订阅；购买凭证为华为账号，卸载重装可免费恢复。"
     },
     {
       "name": "mindmap_preview_title",
       "value": "思维导图预览"
-    },
-    {
-      "name": "mindmap_entry_desc",
-      "value": "树构建 · 左右分形布局 · 三主题 PNG · .mm / .opml"
-    },
-    {
-      "name": "mindmap_open_preview",
-      "value": "打开预览"
     },
     {
       "name": "mindmap_theme_fresh",
@@ -106,11 +130,215 @@
     },
     {
       "name": "mindmap_demo_note",
-      "value": "内置示例文档，真实内容转换将在 M4 接入"
+      "value": "内置示例文档，展示思维导图渲染效果。"
+    },
+    {
+      "name": "mindmap_custom_note",
+      "value": "当前渲染内容来自转换页输入。"
     },
     {
       "name": "mindmap_rendering",
       "value": "渲染中…"
+    },
+    {
+      "name": "md_preview_title",
+      "value": "MD 渲染预览"
+    },
+    {
+      "name": "md_preview_entry_desc",
+      "value": "表格 · 代码高亮 · 任务列表 · 引用块"
+    },
+    {
+      "name": "md_preview_copy_done",
+      "value": "代码已复制"
+    },
+    {
+      "name": "md_preview_demo_note",
+      "value": "内置示例文档，支持表格、代码块、任务列表渲染。"
+    },
+    {
+      "name": "convert_title",
+      "value": "格式转换"
+    },
+    {
+      "name": "convert_desc",
+      "value": "MD → JSON · YAML · 思维导图 .mm · 大纲 .opml · Word"
+    },
+    {
+      "name": "convert_pick_file",
+      "value": "选择 .md 文件"
+    },
+    {
+      "name": "convert_paste_hint",
+      "value": "或在下方粘贴 / 编辑 Markdown 内容"
+    },
+    {
+      "name": "convert_paste_placeholder",
+      "value": "粘贴 Markdown 内容…"
+    },
+    {
+      "name": "convert_fmt_label",
+      "value": "目标格式"
+    },
+    {
+      "name": "convert_fmt_json",
+      "value": "JSON"
+    },
+    {
+      "name": "convert_fmt_yaml",
+      "value": "YAML"
+    },
+    {
+      "name": "convert_fmt_mm",
+      "value": "思维导图 .mm"
+    },
+    {
+      "name": "convert_fmt_opml",
+      "value": "大纲 .opml"
+    },
+    {
+      "name": "convert_fmt_docx",
+      "value": "Word .docx"
+    },
+    {
+      "name": "convert_mode_label",
+      "value": "结构模式"
+    },
+    {
+      "name": "convert_mode_flat",
+      "value": "扁平 blocks"
+    },
+    {
+      "name": "convert_mode_tree",
+      "value": "树形 sections"
+    },
+    {
+      "name": "convert_run",
+      "value": "转换"
+    },
+    {
+      "name": "convert_export",
+      "value": "导出保存"
+    },
+    {
+      "name": "convert_share",
+      "value": "分享"
+    },
+    {
+      "name": "convert_share_fail",
+      "value": "分享失败"
+    },
+    {
+      "name": "convert_mind_preview",
+      "value": "导图预览"
+    },
+    {
+      "name": "convert_source_tab",
+      "value": "源码"
+    },
+    {
+      "name": "convert_outline_tab",
+      "value": "大纲树"
+    },
+    {
+      "name": "convert_outline_empty",
+      "value": "（空文档）"
+    },
+    {
+      "name": "convert_recent",
+      "value": "最近"
+    },
+    {
+      "name": "convert_batch_entry",
+      "value": "批量转换"
+    },
+    {
+      "name": "convert_mdpreview_entry",
+      "value": "MD 渲染"
+    },
+    {
+      "name": "convert_result_title",
+      "value": "转换结果"
+    },
+    {
+      "name": "convert_docx_ready",
+      "value": "DOCX 已生成（%d KB）"
+    },
+    {
+      "name": "convert_chars",
+      "value": "%d 字符"
+    },
+    {
+      "name": "convert_empty_input",
+      "value": "请先选择文件或输入内容"
+    },
+    {
+      "name": "convert_export_first",
+      "value": "请先执行转换"
+    },
+    {
+      "name": "convert_too_large",
+      "value": "文件较大，仅加载前 %d 字符"
+    },
+    {
+      "name": "convert_fail",
+      "value": "转换失败"
+    },
+    {
+      "name": "read_fail",
+      "value": "文件读取失败"
+    },
+    {
+      "name": "export_done",
+      "value": "已导出：%s"
+    },
+    {
+      "name": "export_fail",
+      "value": "导出失败"
+    },
+    {
+      "name": "batch_title",
+      "value": "批量转换"
+    },
+    {
+      "name": "batch_desc",
+      "value": "多个 .md 一次转换，打包为 ZIP 导出"
+    },
+    {
+      "name": "batch_pick",
+      "value": "选择多个 .md 文件"
+    },
+    {
+      "name": "batch_run",
+      "value": "转换并导出 ZIP"
+    },
+    {
+      "name": "batch_empty",
+      "value": "尚未选择文件"
+    },
+    {
+      "name": "batch_pending",
+      "value": "待转换"
+    },
+    {
+      "name": "batch_ok",
+      "value": "成功"
+    },
+    {
+      "name": "batch_fail",
+      "value": "失败"
+    },
+    {
+      "name": "batch_summary",
+      "value": "成功 %d 个，失败 %d 个"
+    },
+    {
+      "name": "batch_all_fail",
+      "value": "全部转换失败"
+    },
+    {
+      "name": "batch_file_count",
+      "value": "已选 %d 个文件"
     }
   ]
 }

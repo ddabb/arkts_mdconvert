@@ -41,9 +41,17 @@ struct MindmapPreviewPage {
   @State pinchBase: number = 1;
   @State panBaseX: number = 0;
   @State panBaseY: number = 0;
+  @State isCustom: boolean = false;
+  private sourceMd: string = DEMO_MD;
   private themes: MindTheme[] = MindTheme.all();
 
   aboutToAppear(): void {
+    const src: string | undefined = AppStorage.get<string>('mdc.mind.src');
+    if (src !== undefined && src.trim().length > 0) {
+      this.sourceMd = src;
+      this.isCustom = true;
+      AppStorage.setOrCreate('mdc.mind.src', '');
+    }
     this.rerender();
   }
 
@@ -54,7 +62,7 @@ struct MindmapPreviewPage {
     this.busy = true;
     const old: MindRenderResult | undefined = this.result;
     const theme: MindTheme = this.themes[this.themeIdx];
-    PngRender.render(DEMO_MD, theme, 12).then((r: MindRenderResult) => {
+    PngRender.render(this.sourceMd, theme, 12).then((r: MindRenderResult) => {
       this.result = r;
       this.busy = false;
       this.resetView();
@@ -94,11 +102,10 @@ struct MindmapPreviewPage {
       fileIo.writeSync(file.fd, bytes.buffer);
       fileIo.closeSync(file);
       this.busy = false;
-      const toast: ShowToastOptions = {
+      this.getUIContext().getPromptAction().showToast({
         message: $r('app.string.mindmap_export_done', path),
         duration: 2500
-      };
-      this.getUIContext().getPromptAction().showToast(toast);
+      });
     }).catch(() => {
       this.busy = false;
       hilog.error(0x0000, 'mdcPreview', '%{public}s', 'export failed');
@@ -205,7 +212,7 @@ struct MindmapPreviewPage {
           })
       }
 
-      Text($r('app.string.mindmap_demo_note'))
+      Text(this.isCustom ? $r('app.string.mindmap_custom_note') : $r('app.string.mindmap_demo_note'))
         .fontSize(11)
         .fontColor($r('app.color.hint_text'))
         .padding({ bottom: 8 })
