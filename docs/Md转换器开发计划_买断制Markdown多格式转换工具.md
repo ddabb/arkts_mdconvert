@@ -338,3 +338,9 @@ entry/src/main/ets/
 - **截图 8 张**（Tablet23 模拟器 2400×1600，同 2in1 主题清单）：01 转换输入（agc_demo.md 导入 255 字符）/02 JSON 结果/03 大纲树/04 导图预览/05 MD 渲染/06 批量 2 文件/07 历史/08 设置；归档 `artifacts/agc-screenshots/tablet/`（108~568KB PNG ≤5MB）；OCR 抽查 02（blocks/sections/heading/level JSON 字段在位）、04（导图根节点+三分支+主题 chips 全渲染）。
 - **平板交互协议沉淀**：文件推送真实路径 /storage/media/100/local/files/docs/Documents/（大小写不敏感挂载，首推 Docs/ 误落 docs 根导致 picker 空，重推正确路径即时刷新）；picker 为 SheetWrapper 底部弹层——单击文件夹=选中、**双击图标=进入**、单击文件行=选中、多选上限 50（已选 x/50）；返回键 uinput -K -d 2 -u 2 可用；外层滚动须在空白区起手（内层 TextArea/大纲 Scroll 会拦截手势）。
 - 环境记录：其他 tablet 实例（Tablet 6.1.1/TabletAgc）仍在 HDD 未修，如需启动复制同款 SSD junction 手术即可。
+
+### 模拟器全量 SSD 迁移与启动测速（2026-10-28）
+- **全量迁移（同款 junction 手术）**：7 实例（Copybook2in1/CopybookPad/PadPhone/PhoneAgc/Pura 90/Tablet/TabletAgc，0.7~6.1GB，含 Pura 90 的 3.7GB overlay 备份）+ 3 个 6.1.1 SDK 镜像（phone/tablet/pc）robocopy /MOVE → `C:\EmuSSD\` + 原路径 junction 回填，共 26.5GB；实例→镜像映射经 config.ini `imageSubPath` 字段确认（5 实例共用 6.1.1 phone）；迁移前 reparse point 扫描 0；C: 41.8→14.7GB，F: 释放至 145.4GB。
+- **删除与环境清理**：5.1.1/phone_all_x86（6.37GB，仅 Huawei_Phone API19 使用且应用装不上）按决策直接删除；Huawei_Phone 实例目录（4.2GB）保留 F: 已不可启动；无任何实例使用的镜像（6.0.31 phone/6.1.1 tv/7.0.0 pc+tablet/7.0.0-B1 共 17.5GB）留 HDD 不动。
+- **冷启动测速 7/7 全成功**（boot-test.ps1：devecocli start→hdc 注册→bootevent.boot.completed，isHotBoot=false）：Copybook2in1/CopybookPad/Pura 90 **51s**、PhoneAgc/PadPhone **71s**、Tablet（6.1.1 tablet 8GB）**76s**、TabletAgc（6.1.1 tablet 4GB）**135s**——两个 HDD 上从未成功启动的 6.1.1 平板 SSD 上完整启动，证实 **HDD 4K IOPS 饥饿为全部平板镜像统一根因**（与 Tablet23 结论互证）。
+- 工具沉淀与陷阱：`Temp\deveco\boot-test.ps1`（异步起 CLI + 轮询新 hdc target + boot.completed + reboot -p 优雅关机）可复用；**Start-Process -ArgumentList 数组元素含空格不加引号会被拆参**（"Pura 90"→"Pura"/"90" 报 Emulator not found，需内嵌引号 '"Pura 90"'）；devecocli 内部 hdc 超时 ~60s，>60s 实例报 "did not appear in timeout" 但实际启动正常（CLI 提示性问题）。
