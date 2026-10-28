@@ -329,3 +329,12 @@ entry/src/main/ets/
 - 裁剪线经逐张 OCR + 逐行 ink/像素剖析定界：01/02/03 y[110,1865]（保页标题+格式按钮行+结果文本至 y1848，切 DecorBar/tabs/任务栏）；04/05 y[150,1905]（保主题 chips/画布/底部操作按钮，切页标题与底部提示）；06 y[200,1955]（保"转换并导出 ZIP"实心按钮 y1879-1955，切标题/副标题）；07 y[173,1928]（唯一保留完整 tabs 三页签+活跃指示条的图，切页标题）；08 y[95,1850]（保应用名品牌头+设置内容，切 tabs）。
 - 关键测定：tab 栏无独立背景（全页统一 245,245,245 白底，tabs 仅 y1888-1925 文字+指示条），裁剪线落在白区无残边；06 ZIP 按钮底边=应用内容底边 y1955 精确对齐；07 历史标题字形 y103 早于记录区 y226，故让位 tabs。
 - 复核：裁后 OCR 验证 07（6 条记录+三页签完整）、04（chips+复位视图按钮 y1689 在位）、06（ZIP 按钮 y1701 在位）；8 张全部 3120×1755 PNG（84~436KB ≤5MB）。
+
+### AGC 截图素材：平板完成（2026-10-28）
+- **根因定案：tablet_x86 镜像 HDD I/O 饥饿**。io-bench.ps1 基准：C: NVMe 4K 随机写 1379 IOPS/读 5649 IOPS vs F: HDD 写 147/读 129 IOPS（顺序读 95MB/s）——平板镜像启动需大量小 IO，HDD 供不上；2in1/phone 轻镜像 HDD 可容忍。audit 风暴对比排除（tablet 9666 次/2h vs 2in1 10575 次/1.5h，速率相当非差异点）。
+- **SSD 迁移手术（可逆 junction 方案）**：中毒 overlay（userdata.img.qcow2 1.31GB）与旧日志归档 F:\EmuArchive\{overlays,logs}-before-ssd-fix\；robocopy /MOVE Tablet23（66.56MB）→ C:\EmuSSD\Tablet23、SDK tablet_x86（4.211GB）→ C:\EmuSSD\sdk-tablet_x86；原路径建 junction 指回，实例配置零改动可回滚。
+- **启动对比：14.65h 从未成功 → 2.5 分钟 hdc 注册**。SSD 首启 RAM 确认 8GB（8139812K/8388028K），appspawn=138/foundation=799 全程零重启，faultlogger 空（零 sysfreeze），bms 28 秒装 59 bundle 后线程池自动停止，load 3.69→0.34；userdata.img.qcow2 真实增长（临时盘异象消失）。架构认知：HarmonyOS 6.1 **sceneboard 即 launcher**（SCBDesktop 组件渲染桌面，无独立 launcher/screenlock 进程）；launcher/weather/ouc 不在精简镜像内（distributeddata 每 ~1s 轮询 totemweather 报 not exist 为无害症状）；bootevent.appfwk.ready 未设置但不阻塞桌面。会话 B 两大谜团（4GB RAM、临时 /data）SSD 下均未复现，不再追。
+- **分辨率合规**：2560×1600（16:10）不满足 §9 平板 3:2 硬性要求，且水平裁剪必切按钮（内容宽 2489px > 2400px）→ 改 config.ini hw.lcd.phy.width 237→222、hw.lcd.single.width 2560→2400 → 原生 **2400×1600（精确 3:2）** 零裁剪零失真；暖启动 ~1 分钟。
+- **截图 8 张**（Tablet23 模拟器 2400×1600，同 2in1 主题清单）：01 转换输入（agc_demo.md 导入 255 字符）/02 JSON 结果/03 大纲树/04 导图预览/05 MD 渲染/06 批量 2 文件/07 历史/08 设置；归档 `artifacts/agc-screenshots/tablet/`（108~568KB PNG ≤5MB）；OCR 抽查 02（blocks/sections/heading/level JSON 字段在位）、04（导图根节点+三分支+主题 chips 全渲染）。
+- **平板交互协议沉淀**：文件推送真实路径 /storage/media/100/local/files/docs/Documents/（大小写不敏感挂载，首推 Docs/ 误落 docs 根导致 picker 空，重推正确路径即时刷新）；picker 为 SheetWrapper 底部弹层——单击文件夹=选中、**双击图标=进入**、单击文件行=选中、多选上限 50（已选 x/50）；返回键 uinput -K -d 2 -u 2 可用；外层滚动须在空白区起手（内层 TextArea/大纲 Scroll 会拦截手势）。
+- 环境记录：其他 tablet 实例（Tablet 6.1.1/TabletAgc）仍在 HDD 未修，如需启动复制同款 SSD junction 手术即可。
