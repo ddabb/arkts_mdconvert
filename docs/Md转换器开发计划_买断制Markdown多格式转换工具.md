@@ -317,3 +317,9 @@ entry/src/main/ets/
 - 环境记录：Huawei_Phone 模拟器镜像 API19 无法安装 API20 应用（code:9568297 older sdk version），Pura 90 镜像 API24（127.0.0.1:5557）可用；安装需等 bundle manager 就绪。
 - 遗留决策：@luvi/lv-markdown-in（含传递依赖 @cangjie-tpc/formula_hybrid、prism_hybrid）与 §10 零三方依赖原则冲突，去留待定夺（自研 MD 渲染替换或修订 §10）。
 - M4 剩余（人工）：M2 Word/WPS 实测矩阵、M3 XMind .mm 导入实测；M5（真机回归+上架素材+AGC 提审）未开始。
+
+### AGC 截图素材：手机/2in1 完成（2026-10-27）
+- 按 §9 规范执行截图：手机 8 张（Pura 90 模拟器，转换输入/JSON 结果/大纲树/导图预览/MD 渲染/批量 2 文件/历史 6 条/设置）+ 2in1 8 张（Copybook2in1 模拟器 3120×2080，同主题；导图画布经像素分析验证已渲染 5.2% ink）。
+- 后处理归档 `artifacts/agc-screenshots/{phone,2in1}/`：手机 1256×2760 → 裁顶 527px → 1080×1920（9:16，OCR 复核内容完整）；2in1 原生 3120×2080（≥1920×1080）；16 张全部 PNG ≤800KB（≤5MB 限值内），OCR 逐张校验关键元素在位。
+- **Bug3 修复（commit 94cc75b）**：历史页签切回不刷新——HistoryPanel 仅 aboutToAppear 加载一次，Tabs 常驻导致转换后切回历史页记录陈旧（须重启应用）；ConvertPanel 写入 HistoryStore 后 bump AppStorage `mdc.historySeq`，HistoryPanel `@StorageProp+@Watch` 实时 reload；2in1 实测不重启切页签，新记录即时显示于列表顶部。
+- **平板截图受阻（本机 tablet_x86 镜像均无法启动）**：Tablet(6.1.1) foundation 每 ~100s 看门狗退出→appspawn 4 次崩溃→bootfail panic（10/23~10/27 六次会话从未成功）；Tablet23(6.1.0) appspawn ~100s 循环 40 次 sceneboard 重建，4GB RAM+擦数据分区试验反致 foundation/appspawn 双循环与崩溃重启（hdc 短暂注册后失联，guest 时钟跳变）；共同病理 jbd2/vdd D 状态阻塞（宿主 C: 剩 48GB/内存剩 19GB，非资源不足）；同机 phone/pc_all_x86 镜像启动正常 → 判定 tablet_x86 镜像与宿主环境不兼容。平板素材待决策：真机平板 / 向华为反馈 / 暂缓上架平板形态。
