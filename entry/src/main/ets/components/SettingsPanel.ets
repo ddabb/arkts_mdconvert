@@ -1,5 +1,65 @@
+import { common } from '@kit.AbilityKit';
+import { DocxOptions } from '../core/DocxOut';
+import { SettingsStore } from '../core/SettingsStore';
+
 @Component
 export struct SettingsPanel {
+  @State docxIndent: boolean = true;
+  @State docxHeadingNum: boolean = false;
+  @State docxToc: boolean = false;
+  @State docxPageNum: boolean = false;
+  @State docxEmbed: boolean = true;
+
+  aboutToAppear(): void {
+    const ctx: common.Context | undefined = this.getUIContext().getHostContext();
+    if (ctx === undefined) {
+      return;
+    }
+    try {
+      SettingsStore.ensure(ctx);
+      const saved: DocxOptions = SettingsStore.docxOptions();
+      this.docxIndent = saved.firstLineIndent;
+      this.docxHeadingNum = saved.headingNumbers;
+      this.docxToc = saved.toc;
+      this.docxPageNum = saved.pageNumbers;
+      this.docxEmbed = saved.embedImages;
+    } catch (err) {
+    }
+  }
+
+  private saveDocx(): void {
+    const ctx: common.Context | undefined = this.getUIContext().getHostContext();
+    if (ctx === undefined) {
+      return;
+    }
+    try {
+      SettingsStore.ensure(ctx);
+      const o: DocxOptions = new DocxOptions();
+      o.firstLineIndent = this.docxIndent;
+      o.headingNumbers = this.docxHeadingNum;
+      o.toc = this.docxToc;
+      o.pageNumbers = this.docxPageNum;
+      o.embedImages = this.docxEmbed;
+      SettingsStore.saveDocxOptions(o);
+    } catch (err) {
+    }
+  }
+
+  @Builder
+  docxRow(label: ResourceStr, isOn: boolean, onTap: () => void) {
+    Row() {
+      Text(label)
+        .fontSize(14)
+        .fontColor($r('app.color.primary_text'))
+        .layoutWeight(1)
+      Toggle({ type: ToggleType.Switch, isOn: isOn })
+        .onChange((value: boolean) => {
+          onTap();
+        })
+    }
+    .width('100%')
+  }
+
   @Builder
   infoCard(title: ResourceStr, body: ResourceStr) {
     Column({ space: 8 }) {
@@ -54,6 +114,38 @@ export struct SettingsPanel {
         this.infoCard($r('app.string.settings_dark_title'), $r('app.string.settings_dark_note'))
         this.infoCard($r('app.string.settings_privacy_title'), $r('app.string.settings_privacy_desc'))
         this.infoCard($r('app.string.settings_buyout_title'), $r('app.string.settings_buyout_desc'))
+
+        Column({ space: 12 }) {
+          Text($r('app.string.settings_docx_title'))
+            .fontSize(15)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.primary_text'))
+          this.docxRow($r('app.string.settings_docx_indent'), this.docxIndent, () => {
+            this.docxIndent = !this.docxIndent;
+            this.saveDocx();
+          })
+          this.docxRow($r('app.string.settings_docx_heading_num'), this.docxHeadingNum, () => {
+            this.docxHeadingNum = !this.docxHeadingNum;
+            this.saveDocx();
+          })
+          this.docxRow($r('app.string.settings_docx_toc'), this.docxToc, () => {
+            this.docxToc = !this.docxToc;
+            this.saveDocx();
+          })
+          this.docxRow($r('app.string.settings_docx_page_num'), this.docxPageNum, () => {
+            this.docxPageNum = !this.docxPageNum;
+            this.saveDocx();
+          })
+          this.docxRow($r('app.string.settings_docx_embed'), this.docxEmbed, () => {
+            this.docxEmbed = !this.docxEmbed;
+            this.saveDocx();
+          })
+        }
+        .width('100%')
+        .padding(16)
+        .backgroundColor($r('app.color.card_background'))
+        .borderRadius(16)
+        .alignItems(HorizontalAlign.Start)
 
         Row({ space: 6 }) {
           Text($r('app.string.version_label'))

@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { MdToDocx } from '../../../main/ets/core/DocxOut';
+import { MdToDocx, DocxOptions } from '../../../main/ets/core/DocxOut';
 import { crc32, utf8Encode } from '../../../main/ets/core/ZipWriter';
 
 class ZipInfo {
@@ -94,6 +94,67 @@ function countOf(s: string, sub: string): number {
 
 function has(s: string, sub: string): void {
   expect(s.indexOf(sub) >= 0).assertTrue();
+}
+
+function pngBytes(w: number, h: number): Uint8Array {
+  const b: Uint8Array = new Uint8Array(33);
+  const sig: number[] = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+  for (let i: number = 0; i < 8; i += 1) {
+    b[i] = sig[i];
+  }
+  const dv: DataView = new DataView(b.buffer);
+  dv.setUint32(8, 13);
+  b[12] = 0x49;
+  b[13] = 0x48;
+  b[14] = 0x44;
+  b[15] = 0x52;
+  dv.setUint32(16, w);
+  dv.setUint32(20, h);
+  b[24] = 8;
+  b[25] = 6;
+  b[26] = 0;
+  b[27] = 0;
+  b[28] = 0;
+  return b;
+}
+
+function jpegBytes(w: number, h: number): Uint8Array {
+  const b: Uint8Array = new Uint8Array(20);
+  b[0] = 0xFF;
+  b[1] = 0xD8;
+  b[2] = 0xFF;
+  b[3] = 0xC0;
+  const dv: DataView = new DataView(b.buffer);
+  dv.setUint16(4, 17);
+  b[6] = 8;
+  dv.setUint16(7, h);
+  dv.setUint16(9, w);
+  b[11] = 3;
+  b[12] = 1;
+  b[13] = 0x11;
+  b[14] = 0;
+  b[15] = 1;
+  b[16] = 0x11;
+  b[17] = 0;
+  b[18] = 1;
+  b[19] = 0x11;
+  return b;
+}
+
+function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length != b.length) {
+    return false;
+  }
+  for (let i: number = 0; i < a.length; i += 1) {
+    if (a[i] != b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function defaultOpts(): DocxOptions {
+  return new DocxOptions();
 }
 
 const SAMPLE: string = [
@@ -373,6 +434,210 @@ export default function mdDocxTest() {
       const infos: ZipInfo[] = readZip(MdToDocx.generate('第一行\n第二行'));
       const doc: string = textOf(infos, 'word/document.xml');
       has(doc, '>第一行 第二行</w:t>');
+    });
+    it('generateWithDefaultsMatchesGenerate', 0, () => {
+      const a: Uint8Array = MdToDocx.generate(SAMPLE);
+      const b: Uint8Array = MdToDocx.generateWith(SAMPLE, defaultOpts(), new Map<string, Uint8Array>());
+      expect(bytesEqual(a, b)).assertTrue();
+    });
+    it('firstLineIndentCjkParas', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.firstLineIndent = true;
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('# 标\n\n中文段落一。\n\n第二段文字。', o,
+        new Map<string, Uint8Array>()));
+      const doc: string = textOf(infos, 'word/document.xml');
+      expect(countOf(doc, 'w:firstLineChars="200"')).assertEqual(2);
+      has(doc, '<w:ind w:firstLineChars="200"/>');
+    });
+    it('firstLineIndentExcludesQuoteListCode', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.firstLineIndent = true;
+      const src: string = '# 标\n\n> 引用段\n\n- 项一\n\n```js\ncode\n```\n\n普通段';
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith(src, o, new Map<string, Uint8Array>()));
+      const doc: string = textOf(infos, 'word/document.xml');
+      expect(countOf(doc, 'w:firstLineChars="200"')).assertEqual(1);
+      has(doc, '<w:ind w:left="360"/>');
+    });
+    it('firstLineIndentNoCjkDoc', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.firstLineIndent = true;
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('Plain text one.\n\nPlain text two.', o,
+        new Map<string, Uint8Array>()));
+      const doc: string = textOf(infos, 'word/document.xml');
+      expect(countOf(doc, 'w:firstLineChars')).assertEqual(0);
+    });
+    it('headingNumberingNum90', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.headingNumbers = true;
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('# A\n\n## B', o, new Map<string, Uint8Array>()));
+      const num: string = textOf(infos, 'word/numbering.xml');
+      has(num, '<w:abstractNum w:abstractNumId="2"');
+      has(num, '<w:num w:numId="90"><w:abstractNumId w:val="2"/></w:num>');
+      has(num, '<w:lvlText w:val="%1."/>');
+      has(num, '<w:lvlText w:val="%1.%2."/>');
+      has(num, '<w:lvlText w:val="%1.%2.%3.%4.%5.%6."/>');
+      const styles: string = textOf(infos, 'word/styles.xml');
+      has(styles, '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="90"/></w:numPr>');
+    });
+    it('tocBookmarksAndAnchors', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.toc = true;
+      o.tocTitle = '目录';
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('# 一级\n\n正文A\n\n## 二级\n\n正文B', o,
+        new Map<string, Uint8Array>()));
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, '<w:bookmarkStart w:id="1" w:name="_Toc1"/>');
+      has(doc, '<w:bookmarkEnd w:id="1"/>');
+      has(doc, 'w:anchor="_Toc1"');
+      has(doc, 'w:anchor="_Toc2"');
+      has(doc, '>目录</w:t>');
+      has(doc, '<w:br w:type="page"/>');
+      const idxToc: number = doc.indexOf('w:anchor="_Toc1"');
+      const idxBody: number = doc.indexOf('>正文A</w:t>');
+      expect(idxToc >= 0 && idxBody > idxToc).assertTrue();
+    });
+    it('tocEmptyDocNoBlock', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.toc = true;
+      o.tocTitle = '目录';
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('只有段落', o, new Map<string, Uint8Array>()));
+      const doc: string = textOf(infos, 'word/document.xml');
+      expect(countOf(doc, 'w:anchor=')).assertEqual(0);
+      expect(countOf(doc, '<w:br w:type="page"/>')).assertEqual(0);
+      expect(doc.indexOf('>目录</w:t>')).assertEqual(-1);
+    });
+    it('pageHeaderFooterParts', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.pageNumbers = true;
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith(SAMPLE, o, new Map<string, Uint8Array>()));
+      const names: string[] = namesOf(infos);
+      expect(names.indexOf('word/header1.xml') >= 0).assertTrue();
+      expect(names.indexOf('word/footer1.xml') >= 0).assertTrue();
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, '<w:headerReference w:type="default" r:id="rId');
+      has(doc, '<w:footerReference w:type="default" r:id="rId');
+      const header: string = textOf(infos, 'word/header1.xml');
+      has(header, '标题一');
+      const footer: string = textOf(infos, 'word/footer1.xml');
+      has(footer, 'w:instr=" PAGE "');
+      has(footer, '<w:fldSimple');
+      const ct: string = textOf(infos, '[Content_Types].xml');
+      has(ct, '/word/header1.xml');
+      has(ct, '/word/footer1.xml');
+      const rels: string = textOf(infos, 'word/_rels/document.xml.rels');
+      has(rels, 'Target="header1.xml"');
+      has(rels, 'Target="footer1.xml"');
+    });
+    it('embedPngImage', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.embedImages = true;
+      const imgs: Map<string, Uint8Array> = new Map<string, Uint8Array>();
+      const px: Uint8Array = pngBytes(2, 3);
+      imgs.set('img.png', px);
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('![甲](img.png)', o, imgs));
+      const names: string[] = namesOf(infos);
+      expect(names.indexOf('word/media/image1.png') >= 0).assertTrue();
+      expect(bytesEqual(findEntry(infos, 'word/media/image1.png').data, px)).assertTrue();
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, '<wp:inline');
+      has(doc, '<wp:extent cx="19050" cy="28575"/>');
+      has(doc, 'r:embed="rId3"');
+      const rels: string = textOf(infos, 'word/_rels/document.xml.rels');
+      has(rels, 'Target="media/image1.png"');
+      const ct: string = textOf(infos, '[Content_Types].xml');
+      has(ct, '<Default Extension="png" ContentType="image/png"/>');
+    });
+    it('embedJpegImage', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.embedImages = true;
+      const imgs: Map<string, Uint8Array> = new Map<string, Uint8Array>();
+      imgs.set('pic.jpg', jpegBytes(4, 2));
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('![乙](pic.jpg)', o, imgs));
+      const names: string[] = namesOf(infos);
+      expect(names.indexOf('word/media/image1.jpg') >= 0).assertTrue();
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, '<wp:extent cx="38100" cy="19050"/>');
+      const ct: string = textOf(infos, '[Content_Types].xml');
+      has(ct, '<Default Extension="jpg" ContentType="image/jpeg"/>');
+    });
+    it('imageTooWideScaled', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.embedImages = true;
+      const imgs: Map<string, Uint8Array> = new Map<string, Uint8Array>();
+      imgs.set('wide.png', pngBytes(10000, 5000));
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('![宽](wide.png)', o, imgs));
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, '<wp:extent cx="5730000" cy="2865000"/>');
+    });
+    it('httpImageNotEmbedded', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.embedImages = true;
+      const imgs: Map<string, Uint8Array> = new Map<string, Uint8Array>();
+      imgs.set('https://a.example.com/x.png', pngBytes(1, 1));
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('![图](https://a.example.com/x.png)', o, imgs));
+      const names: string[] = namesOf(infos);
+      expect(names.length).assertEqual(6);
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, '>[图](https://a.example.com/x.png)</w:t>');
+      const ct: string = textOf(infos, '[Content_Types].xml');
+      expect(ct.indexOf('image/png')).assertEqual(-1);
+    });
+    it('invalidBytesFallback', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.embedImages = true;
+      const imgs: Map<string, Uint8Array> = new Map<string, Uint8Array>();
+      imgs.set('bad.png', utf8Encode('not an image'));
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('![坏](bad.png)', o, imgs));
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, '>[坏](bad.png)</w:t>');
+      expect(namesOf(infos).length).assertEqual(6);
+    });
+    it('embedImagesOffPlaceholder', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.embedImages = false;
+      const imgs: Map<string, Uint8Array> = new Map<string, Uint8Array>();
+      imgs.set('img.png', pngBytes(1, 1));
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('![甲](img.png)', o, imgs));
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, '>[甲](img.png)</w:t>');
+      expect(namesOf(infos).length).assertEqual(6);
+    });
+    it('imageDuplicateUrlSingleMedia', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.embedImages = true;
+      const imgs: Map<string, Uint8Array> = new Map<string, Uint8Array>();
+      imgs.set('x.png', pngBytes(1, 1));
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('![a](x.png)![b](x.png)', o, imgs));
+      const rels: string = textOf(infos, 'word/_rels/document.xml.rels');
+      expect(countOf(rels, 'Target="media/image1.png"')).assertEqual(1);
+      expect(namesOf(infos).filter((n: string) => n.startsWith('word/media/')).length).assertEqual(1);
+    });
+    it('collectImageUrlsFilters', 0, () => {
+      const urls: string[] = MdToDocx.collectImageUrls(
+        '![a](x.png)![b](x.png)![c](https://e.com/y.png)![d](/abs/z.jpg)');
+      expect(urls.length).assertEqual(2);
+      expect(urls[0]).assertEqual('x.png');
+      expect(urls[1]).assertEqual('/abs/z.jpg');
+    });
+    it('imageInTableCollected', 0, () => {
+      const urls: string[] = MdToDocx.collectImageUrls('| h |\n| - |\n| ![c](cell.png) |');
+      expect(urls.length).assertEqual(1);
+      expect(urls[0]).assertEqual('cell.png');
+    });
+    it('tocAndHeadingNumbersCombined', 0, () => {
+      const o: DocxOptions = defaultOpts();
+      o.toc = true;
+      o.tocTitle = '目录';
+      o.headingNumbers = true;
+      const infos: ZipInfo[] = readZip(MdToDocx.generateWith('# 一\n\n文\n\n## 二', o,
+        new Map<string, Uint8Array>()));
+      const doc: string = textOf(infos, 'word/document.xml');
+      has(doc, 'w:anchor="_Toc1"');
+      has(doc, '<w:bookmarkStart w:id="2" w:name="_Toc2"/>');
+      const num: string = textOf(infos, 'word/numbering.xml');
+      has(num, '<w:num w:numId="90">');
+      const styles: string = textOf(infos, 'word/styles.xml');
+      has(styles, '<w:numId w:val="90"/>');
     });
   });
 }

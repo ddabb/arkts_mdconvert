@@ -6,7 +6,9 @@ import { fileUri } from '@kit.CoreFileKit';
 import { LengthMetrics } from '@kit.ArkUI';
 import { MdToJson } from '../core/MdJsonOut';
 import { MdToYaml } from '../core/MdYamlOut';
-import { MdToDocx } from '../core/DocxOut';
+import { MdToDocx, DocxOptions } from '../core/DocxOut';
+import { DocxImageLoader } from '../core/DocxImageLoader';
+import { SettingsStore } from '../core/SettingsStore';
 import { MdToMm, MdToOpml } from '../core/MmOpmlOut';
 import { FileUtil } from '../core/FileIoUtil';
 import { HistoryRecord, HistoryStore } from '../core/HistoryStore';
@@ -38,6 +40,7 @@ export struct ConvertPanel {
   @State resultText: string = '';
   @State docxKb: number = 0;
   private docxBytes: Uint8Array | undefined = undefined;
+  private baseDir: string = '';
   @State previewTab: number = 0;
   @State outlineItems: OutlineItem[] = [];
   @State recents: RecentFile[] = [];
@@ -54,6 +57,7 @@ export struct ConvertPanel {
     }
     this.mdText = rec.content;
     this.fileName = rec.fileName;
+    this.baseDir = '';
     if (rec.fmt == 'json') {
       this.fmtIdx = 0;
     } else if (rec.fmt == 'yaml') {
@@ -191,6 +195,7 @@ export struct ConvertPanel {
         }
         this.fileName = FileUtil.fileNameOf(uris[0]);
         this.mdText = text;
+        this.baseDir = FileUtil.dirOf(uris[0]);
         this.resultText = '';
         this.docxBytes = undefined;
         this.docxKb = 0;
@@ -234,7 +239,10 @@ export struct ConvertPanel {
       } else if (this.fmtIdx == 3) {
         this.resultText = MdToOpml.opml(src);
       } else {
-        const bytes: Uint8Array = MdToDocx.generate(src);
+        const opts: DocxOptions = this.docxOptions();
+        const images: Map<string, Uint8Array> = opts.embedImages ?
+          DocxImageLoader.load(src, this.baseDir) : new Map<string, Uint8Array>();
+        const bytes: Uint8Array = MdToDocx.generateWith(src, opts, images);
         this.docxBytes = bytes;
         this.docxKb = Math.ceil(bytes.length / 1024);
       }
@@ -263,6 +271,26 @@ export struct ConvertPanel {
     const base: string = this.fileName.length > 0 ?
       FileUtil.baseName(this.fileName) : 'mdconvert';
     return base + this.extOf();
+  }
+
+  private docxOptions(): DocxOptions {
+    const opts: DocxOptions = new DocxOptions();
+    const ctx: common.Context | undefined = this.getUIContext().getHostContext();
+    if (ctx === undefined) {
+      return opts;
+    }
+    try {
+      SettingsStore.ensure(ctx);
+      const saved: DocxOptions = SettingsStore.docxOptions();
+      opts.firstLineIndent = saved.firstLineIndent;
+      opts.headingNumbers = saved.headingNumbers;
+      opts.toc = saved.toc;
+      opts.pageNumbers = saved.pageNumbers;
+      opts.embedImages = saved.embedImages;
+      opts.tocTitle = ctx.resourceManager.getStringSync($r('app.string.docx_toc_title'));
+    } catch (err) {
+    }
+    return opts;
   }
 
   private doExport(): void {
@@ -347,6 +375,7 @@ export struct ConvertPanel {
   private loadRecent(f: RecentFile): void {
     this.fileName = f.name;
     this.mdText = f.content;
+    this.baseDir = '';
     this.resultText = '';
     this.docxBytes = undefined;
     this.docxKb = 0;
@@ -445,6 +474,7 @@ export struct ConvertPanel {
               .borderRadius(10)
               .onChange((value: string) => {
                 this.mdText = value;
+                this.baseDir = '';
               })
           } else {
             OutlineTree({ items: this.outlineItems })

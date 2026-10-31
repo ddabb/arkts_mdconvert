@@ -343,6 +343,34 @@
     {
       "name": "batch_file_count",
       "value": "%d files selected"
+    },
+    {
+      "name": "docx_toc_title",
+      "value": "Contents"
+    },
+    {
+      "name": "settings_docx_title",
+      "value": "Word Layout"
+    },
+    {
+      "name": "settings_docx_indent",
+      "value": "First-line indent (CJK)"
+    },
+    {
+      "name": "settings_docx_heading_num",
+      "value": "Multilevel heading numbers"
+    },
+    {
+      "name": "settings_docx_toc",
+      "value": "Table of contents"
+    },
+    {
+      "name": "settings_docx_page_num",
+      "value": "Header & page numbers"
+    },
+    {
+      "name": "settings_docx_embed",
+      "value": "Embed local images"
     }
   ]
 }

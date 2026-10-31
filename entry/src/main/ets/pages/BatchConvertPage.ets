@@ -3,7 +3,9 @@ import { common } from '@kit.AbilityKit';
 import { LengthMetrics } from '@kit.ArkUI';
 import { MdToJson } from '../core/MdJsonOut';
 import { MdToYaml } from '../core/MdYamlOut';
-import { MdToDocx } from '../core/DocxOut';
+import { MdToDocx, DocxOptions } from '../core/DocxOut';
+import { DocxImageLoader } from '../core/DocxImageLoader';
+import { SettingsStore } from '../core/SettingsStore';
 import { MdToMm, MdToOpml } from '../core/MmOpmlOut';
 import { FileUtil } from '../core/FileIoUtil';
 import { ZipWriter } from '../core/ZipWriter';
@@ -143,6 +145,26 @@ struct BatchConvertPage {
     });
   }
 
+  private docxOptions(): DocxOptions {
+    const opts: DocxOptions = new DocxOptions();
+    const ctx: common.Context | undefined = this.getUIContext().getHostContext();
+    if (ctx === undefined) {
+      return opts;
+    }
+    try {
+      SettingsStore.ensure(ctx);
+      const saved: DocxOptions = SettingsStore.docxOptions();
+      opts.firstLineIndent = saved.firstLineIndent;
+      opts.headingNumbers = saved.headingNumbers;
+      opts.toc = saved.toc;
+      opts.pageNumbers = saved.pageNumbers;
+      opts.embedImages = saved.embedImages;
+      opts.tocTitle = ctx.resourceManager.getStringSync($r('app.string.docx_toc_title'));
+    } catch (err) {
+    }
+    return opts;
+  }
+
   private runBatch(): void {
     if (this.busy) {
       return;
@@ -172,7 +194,10 @@ struct BatchConvertPage {
           entryBase = base + '_' + count.toString();
         }
         if (this.fmtIdx == 4) {
-          zip.addBytes(entryBase + this.extOf(), MdToDocx.generate(text));
+          const opts: DocxOptions = this.docxOptions();
+          const images: Map<string, Uint8Array> = opts.embedImages ?
+            DocxImageLoader.load(text, FileUtil.dirOf(f.uri)) : new Map<string, Uint8Array>();
+          zip.addBytes(entryBase + this.extOf(), MdToDocx.generateWith(text, opts, images));
         } else if (this.fmtIdx == 0) {
           zip.add(entryBase + '.json', this.treeMode ? MdToJson.tree(text) : MdToJson.flat(text));
         } else if (this.fmtIdx == 1) {

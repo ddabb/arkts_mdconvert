@@ -2,7 +2,7 @@ import { fileIo } from '@kit.CoreFileKit';
 import { util } from '@kit.ArkTS';
 
 export class FileUtil {
-  static readText(uri: string): string {
+  static readBytes(uri: string): Uint8Array {
     const file: fileIo.File = fileIo.openSync(uri, fileIo.OpenMode.READ_ONLY);
     try {
       const chunkSize: number = 65536;
@@ -28,11 +28,15 @@ export class FileUtil {
         all.set(part, pos);
         pos += part.length;
       }
-      const decoder: util.TextDecoder = util.TextDecoder.create('utf-8');
-      return decoder.decodeToString(all);
+      return all;
     } finally {
       fileIo.closeSync(file);
     }
+  }
+
+  static readText(uri: string): string {
+    const decoder: util.TextDecoder = util.TextDecoder.create('utf-8');
+    return decoder.decodeToString(FileUtil.readBytes(uri));
   }
 
   static writeText(uri: string, text: string): void {
@@ -53,6 +57,12 @@ export class FileUtil {
     const decoded: string = decodeURIComponent(uri);
     const idx: number = decoded.lastIndexOf('/');
     return idx >= 0 ? decoded.substring(idx + 1) : decoded;
+  }
+
+  static dirOf(uri: string): string {
+    const decoded: string = decodeURIComponent(uri);
+    const idx: number = decoded.lastIndexOf('/');
+    return idx >= 0 ? decoded.substring(0, idx) : '';
   }
 
   static baseName(name: string): string {

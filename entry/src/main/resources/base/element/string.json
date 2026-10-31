@@ -343,6 +343,34 @@
     {
       "name": "batch_file_count",
       "value": "已选 %d 个文件"
+    },
+    {
+      "name": "docx_toc_title",
+      "value": "目录"
+    },
+    {
+      "name": "settings_docx_title",
+      "value": "Word 排版"
+    },
+    {
+      "name": "settings_docx_indent",
+      "value": "中文段落首行缩进"
+    },
+    {
+      "name": "settings_docx_heading_num",
+      "value": "标题多级编号"
+    },
+    {
+      "name": "settings_docx_toc",
+      "value": "自动生成目录页"
+    },
+    {
+      "name": "settings_docx_page_num",
+      "value": "页眉页脚与页码"
+    },
+    {
+      "name": "settings_docx_embed",
+      "value": "嵌入本地图片"
     }
   ]
 }
