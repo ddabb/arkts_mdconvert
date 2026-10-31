@@ -19,6 +19,7 @@ import mdMindLayoutTest from './MdMindLayout.test';
 import mdMmOpmlTest from './MdMmOpml.test';
 import mdPngRenderTest from './MdPngRender.test';
 import mdXmindTest from './MdXmind.test';
+import mdFileIoTest from './MdFileIo.test';
 import mdHistoryTest from './MdHistory.test';
 
 export default function testsuite() {
@@ -35,5 +36,6 @@ export default function testsuite() {
   mdMmOpmlTest();
   mdPngRenderTest();
   mdXmindTest();
+  mdFileIoTest();
   mdHistoryTest();
 }

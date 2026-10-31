@@ -345,6 +345,10 @@
       "value": "%d files selected"
     },
     {
+      "name": "batch_progress",
+      "value": "Converted %d/%d"
+    },
+    {
       "name": "docx_toc_title",
       "value": "Contents"
     },

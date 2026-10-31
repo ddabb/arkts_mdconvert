@@ -35,8 +35,35 @@ export class FileUtil {
   }
 
   static readText(uri: string): string {
-    const decoder: util.TextDecoder = util.TextDecoder.create('utf-8');
-    return decoder.decodeToString(FileUtil.readBytes(uri));
+    return FileUtil.readTextChunked(uri, 1048576);
+  }
+
+  static readTextChunked(uri: string, chunkSize: number): string {
+    const file: fileIo.File = fileIo.openSync(uri, fileIo.OpenMode.READ_ONLY);
+    try {
+      const decoder: util.TextDecoder = util.TextDecoder.create('utf-8');
+      const streamOpt: util.DecodeToStringOptions = { stream: true };
+      const endOpt: util.DecodeToStringOptions = { stream: false };
+      const parts: string[] = [];
+      const buf: ArrayBuffer = new ArrayBuffer(chunkSize);
+      let done: boolean = false;
+      while (!done) {
+        const read: number = fileIo.readSync(file.fd, buf);
+        if (read <= 0) {
+          done = true;
+        } else {
+          const view: Uint8Array = new Uint8Array(buf).subarray(0, read);
+          parts.push(decoder.decodeToString(view, streamOpt));
+          if (read < chunkSize) {
+            done = true;
+          }
+        }
+      }
+      parts.push(decoder.decodeToString(new Uint8Array(0), endOpt));
+      return parts.join('');
+    } finally {
+      fileIo.closeSync(file);
+    }
   }
 
   static writeText(uri: string, text: string): void {

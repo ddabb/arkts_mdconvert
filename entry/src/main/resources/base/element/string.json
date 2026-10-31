@@ -345,6 +345,10 @@
       "value": "已选 %d 个文件"
     },
     {
+      "name": "batch_progress",
+      "value": "已转换 %d/%d"
+    },
+    {
       "name": "docx_toc_title",
       "value": "目录"
     },

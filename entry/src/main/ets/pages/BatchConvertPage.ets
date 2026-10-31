@@ -1,6 +1,7 @@
 import { picker } from '@kit.CoreFileKit';
 import { common } from '@kit.AbilityKit';
 import { LengthMetrics } from '@kit.ArkUI';
+import { hilog, hidebug } from '@kit.PerformanceAnalysisKit';
 import { MdToJson } from '../core/MdJsonOut';
 import { MdToYaml } from '../core/MdYamlOut';
 import { MdToDocx, DocxOptions } from '../core/DocxOut';
@@ -77,6 +78,8 @@ struct BatchConvertPage {
   @State fmtIdx: number = 0;
   @State treeMode: boolean = true;
   @State busy: boolean = false;
+  @State done: number = 0;
+  @State total: number = 0;
 
   private fmtLabel(idx: number): ResourceStr {
     if (idx == 0) {
@@ -124,7 +127,7 @@ struct BatchConvertPage {
     }
     const docPicker: picker.DocumentViewPicker = new picker.DocumentViewPicker(ctx);
     const opt: picker.DocumentSelectOptions = {
-      maxSelectNumber: 50,
+      maxSelectNumber: 100,
       fileSuffixFilters: ['.md', '.markdown']
     };
     docPicker.select(opt).then((uris: Array<string>) => {
@@ -165,7 +168,13 @@ struct BatchConvertPage {
     return opts;
   }
 
-  private runBatch(): void {
+  private yieldUi(): Promise<void> {
+    return new Promise<void>((resolve: () => void) => {
+      setTimeout(resolve, 0);
+    });
+  }
+
+  private async runBatch(): Promise<void> {
     if (this.busy) {
       return;
     }
@@ -174,13 +183,17 @@ struct BatchConvertPage {
       return;
     }
     this.busy = true;
+    this.done = 0;
+    this.total = this.files.length;
     for (const f of this.files) {
       f.status = 0;
     }
+    const docxOpts: DocxOptions = this.docxOptions();
     const zip: ZipWriter = new ZipWriter();
     const used: Map<string, number> = new Map<string, number>();
     let ok: number = 0;
     let fail: number = 0;
+    let peakVss: bigint = hidebug.getVss();
     for (const f of this.files) {
       try {
         const text: string = FileUtil.readText(f.uri);
@@ -194,10 +207,9 @@ struct BatchConvertPage {
           entryBase = base + '_' + count.toString();
         }
         if (this.fmtIdx == 4) {
-          const opts: DocxOptions = this.docxOptions();
-          const images: Map<string, Uint8Array> = opts.embedImages ?
+          const images: Map<string, Uint8Array> = docxOpts.embedImages ?
             DocxImageLoader.load(text, FileUtil.dirOf(f.uri)) : new Map<string, Uint8Array>();
-          zip.addBytes(entryBase + this.extOf(), MdToDocx.generateWith(text, opts, images));
+          zip.addBytes(entryBase + this.extOf(), MdToDocx.generateWith(text, docxOpts, images));
         } else if (this.fmtIdx == 0) {
           zip.add(entryBase + '.json', this.treeMode ? MdToJson.tree(text) : MdToJson.flat(text));
         } else if (this.fmtIdx == 1) {
@@ -213,7 +225,16 @@ struct BatchConvertPage {
         f.status = 2;
         fail += 1;
       }
+      this.done += 1;
+      const vss: bigint = hidebug.getVss();
+      if (vss > peakVss) {
+        peakVss = vss;
+      }
+      await this.yieldUi();
     }
+    hilog.info(0x0000, 'mdcBatch',
+      'BATCH_MEM files=%{public}d ok=%{public}d fail=%{public}d peakVss=%{public}sKB',
+      this.total, ok, fail, peakVss.toString());
     if (ok == 0) {
       this.busy = false;
       this.toast($r('app.string.batch_all_fail'));
@@ -352,6 +373,20 @@ struct BatchConvertPage {
       .width('100%')
       .align(Alignment.Top)
       .edgeEffect(EdgeEffect.Spring)
+
+      if (this.busy) {
+        Column({ space: 6 }) {
+          Progress({ value: this.done, total: this.total, type: ProgressType.Linear })
+            .width('86%')
+            .color($r('app.color.brand'))
+            .backgroundColor($r('app.color.page_background'))
+            .borderRadius(4)
+          Text($r('app.string.batch_progress', this.done, this.total))
+            .fontSize(12)
+            .fontColor($r('app.color.secondary_text'))
+        }
+        .width('100%')
+      }
 
       Button($r('app.string.batch_run'))
         .backgroundColor($r('app.color.brand'))
