@@ -205,6 +205,14 @@
       "value": "Word .docx"
     },
     {
+      "name": "convert_fmt_html",
+      "value": "HTML"
+    },
+    {
+      "name": "convert_fmt_csv",
+      "value": "CSV"
+    },
+    {
       "name": "convert_mode_label",
       "value": "Structure Mode"
     },

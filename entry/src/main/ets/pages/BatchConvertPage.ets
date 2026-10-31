@@ -5,6 +5,8 @@ import { hilog, hidebug } from '@kit.PerformanceAnalysisKit';
 import { MdToJson } from '../core/MdJsonOut';
 import { MdToYaml } from '../core/MdYamlOut';
 import { MdToDocx, DocxOptions } from '../core/DocxOut';
+import { MdToHtml } from '../core/MdHtmlOut';
+import { MdToCsv } from '../core/MdCsvOut';
 import { DocxImageLoader } from '../core/DocxImageLoader';
 import { SettingsStore } from '../core/SettingsStore';
 import { MdToMm, MdToOpml } from '../core/MmOpmlOut';
@@ -94,7 +96,13 @@ struct BatchConvertPage {
     if (idx == 3) {
       return $r('app.string.convert_fmt_opml');
     }
-    return $r('app.string.convert_fmt_docx');
+    if (idx == 4) {
+      return $r('app.string.convert_fmt_docx');
+    }
+    if (idx == 5) {
+      return $r('app.string.convert_fmt_html');
+    }
+    return $r('app.string.convert_fmt_csv');
   }
 
   private extOf(): string {
@@ -110,7 +118,13 @@ struct BatchConvertPage {
     if (this.fmtIdx == 3) {
       return '.opml';
     }
-    return '.docx';
+    if (this.fmtIdx == 4) {
+      return '.docx';
+    }
+    if (this.fmtIdx == 5) {
+      return '.html';
+    }
+    return '.csv';
   }
 
   private toast(msg: ResourceStr): void {
@@ -216,8 +230,12 @@ struct BatchConvertPage {
           zip.add(entryBase + '.yaml', this.treeMode ? MdToYaml.tree(text) : MdToYaml.flat(text));
         } else if (this.fmtIdx == 2) {
           zip.add(entryBase + '.mm', MdToMm.mm(text));
-        } else {
+        } else if (this.fmtIdx == 3) {
           zip.add(entryBase + '.opml', MdToOpml.opml(text));
+        } else if (this.fmtIdx == 5) {
+          zip.add(entryBase + '.html', MdToHtml.html(text, entryBase));
+        } else {
+          zip.addBytes(entryBase + '.csv', MdToCsv.csvBytes(text));
         }
         f.status = 1;
         ok += 1;
@@ -289,7 +307,7 @@ struct BatchConvertPage {
               .fontWeight(FontWeight.Bold)
               .fontColor($r('app.color.primary_text'))
             Flex({ wrap: FlexWrap.Wrap, space: { main: LengthMetrics.vp(8), cross: LengthMetrics.vp(8) } }) {
-              ForEach([0, 1, 2, 3, 4], (idx: number) => {
+              ForEach([0, 1, 2, 3, 4, 5, 6], (idx: number) => {
                 Text(this.fmtLabel(idx))
                   .fontSize(13)
                   .fontColor(this.fmtIdx == idx ? Color.White : $r('app.color.primary_text'))

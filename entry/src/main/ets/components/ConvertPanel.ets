@@ -7,6 +7,8 @@ import { LengthMetrics } from '@kit.ArkUI';
 import { MdToJson } from '../core/MdJsonOut';
 import { MdToYaml } from '../core/MdYamlOut';
 import { MdToDocx, DocxOptions } from '../core/DocxOut';
+import { MdToHtml } from '../core/MdHtmlOut';
+import { MdToCsv } from '../core/MdCsvOut';
 import { DocxImageLoader } from '../core/DocxImageLoader';
 import { SettingsStore } from '../core/SettingsStore';
 import { MdToMm, MdToOpml } from '../core/MmOpmlOut';
@@ -66,6 +68,10 @@ export struct ConvertPanel {
       this.fmtIdx = 2;
     } else if (rec.fmt == 'opml') {
       this.fmtIdx = 3;
+    } else if (rec.fmt == 'html') {
+      this.fmtIdx = 5;
+    } else if (rec.fmt == 'csv') {
+      this.fmtIdx = 6;
     } else {
       this.fmtIdx = 4;
     }
@@ -87,7 +93,13 @@ export struct ConvertPanel {
     if (idx == 3) {
       return $r('app.string.convert_fmt_opml');
     }
-    return $r('app.string.convert_fmt_docx');
+    if (idx == 4) {
+      return $r('app.string.convert_fmt_docx');
+    }
+    if (idx == 5) {
+      return $r('app.string.convert_fmt_html');
+    }
+    return $r('app.string.convert_fmt_csv');
   }
 
   private fmtKey(): string {
@@ -103,7 +115,13 @@ export struct ConvertPanel {
     if (this.fmtIdx == 3) {
       return 'opml';
     }
-    return 'docx';
+    if (this.fmtIdx == 4) {
+      return 'docx';
+    }
+    if (this.fmtIdx == 5) {
+      return 'html';
+    }
+    return 'csv';
   }
 
   private modeKey(): string {
@@ -136,7 +154,13 @@ export struct ConvertPanel {
     if (this.fmtIdx == 3) {
       return '.opml';
     }
-    return '.docx';
+    if (this.fmtIdx == 4) {
+      return '.docx';
+    }
+    if (this.fmtIdx == 5) {
+      return '.html';
+    }
+    return '.csv';
   }
 
   private toast(msg: ResourceStr): void {
@@ -238,13 +262,19 @@ export struct ConvertPanel {
         this.resultText = MdToMm.mm(src);
       } else if (this.fmtIdx == 3) {
         this.resultText = MdToOpml.opml(src);
-      } else {
+      } else if (this.fmtIdx == 4) {
         const opts: DocxOptions = this.docxOptions();
         const images: Map<string, Uint8Array> = opts.embedImages ?
           DocxImageLoader.load(src, this.baseDir) : new Map<string, Uint8Array>();
         const bytes: Uint8Array = MdToDocx.generateWith(src, opts, images);
         this.docxBytes = bytes;
         this.docxKb = Math.ceil(bytes.length / 1024);
+      } else if (this.fmtIdx == 5) {
+        this.resultText = MdToHtml.html(src,
+          this.fileName.length > 0 ? FileUtil.baseName(this.fileName) : '');
+      } else {
+        this.resultText = MdToCsv.csvText(src);
+        this.docxBytes = MdToCsv.csvBytes(src);
       }
       this.recordHistory(src);
     } catch (err) {
@@ -344,7 +374,7 @@ export struct ConvertPanel {
         FileUtil.writeText(path, this.resultText);
       }
       const record: systemShare.SharedRecord = {
-        utd: bytes !== undefined ?
+        utd: bytes !== undefined && this.fmtIdx == 4 ?
           uniformTypeDescriptor.UniformDataType.WORD_DOC :
           uniformTypeDescriptor.UniformDataType.PLAIN_TEXT,
         uri: fileUri.getUriFromPath(path)
@@ -498,7 +528,7 @@ export struct ConvertPanel {
             .fontWeight(FontWeight.Bold)
             .fontColor($r('app.color.primary_text'))
           Flex({ wrap: FlexWrap.Wrap, space: { main: LengthMetrics.vp(8), cross: LengthMetrics.vp(8) } }) {
-            ForEach([0, 1, 2, 3, 4], (idx: number) => {
+            ForEach([0, 1, 2, 3, 4, 5, 6], (idx: number) => {
               Text(this.fmtLabel(idx))
                 .fontSize(13)
                 .fontColor(this.fmtIdx == idx ? Color.White : $r('app.color.primary_text'))

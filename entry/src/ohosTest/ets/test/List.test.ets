@@ -20,6 +20,7 @@ import mdMmOpmlTest from './MdMmOpml.test';
 import mdPngRenderTest from './MdPngRender.test';
 import mdXmindTest from './MdXmind.test';
 import mdFileIoTest from './MdFileIo.test';
+import mdHtmlCsvTest from './MdHtmlCsv.test';
 import mdHistoryTest from './MdHistory.test';
 
 export default function testsuite() {
@@ -37,5 +38,6 @@ export default function testsuite() {
   mdPngRenderTest();
   mdXmindTest();
   mdFileIoTest();
+  mdHtmlCsvTest();
   mdHistoryTest();
 }
