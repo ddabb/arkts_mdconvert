@@ -22,7 +22,7 @@
     },
     {
       "name": "hint_text",
-      "value": "#999999"
+      "value": "#6B6B6B"
     },
     {
       "name": "border_color",
@@ -30,11 +30,11 @@
     },
     {
       "name": "brand",
-      "value": "#0284C7"
+      "value": "#0369A1"
     },
     {
       "name": "brand_tint",
-      "value": "#1A0284C7"
+      "value": "#1A0369A1"
     },
     {
       "name": "accent",
@@ -42,11 +42,11 @@
     },
     {
       "name": "success_green",
-      "value": "#15803D"
+      "value": "#166534"
     },
     {
       "name": "danger_red",
-      "value": "#DC2626"
+      "value": "#B91C1C"
     },
     {
       "name": "on_accent_text",

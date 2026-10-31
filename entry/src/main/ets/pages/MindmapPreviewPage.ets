@@ -1,8 +1,8 @@
-import { fileIo } from '@kit.CoreFileKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { MindTheme } from '../core/MindmapTheme';
 import { MindRenderResult, PngRender } from '../core/PngRender';
+import { AlbumImageSaver } from '../core/AlbumImageSaver';
 
 const DEMO_MD: string = [
   '# MdConvert 思维导图',
@@ -35,6 +35,7 @@ struct MindmapPreviewPage {
   @State themeIdx: number = 0;
   @State result: MindRenderResult | undefined = undefined;
   @State busy: boolean = false;
+  @State saving: boolean = false;
   @State viewScale: number = 1;
   @State offsetX: number = 0;
   @State offsetY: number = 0;
@@ -84,32 +85,34 @@ struct MindmapPreviewPage {
     this.panBaseY = 0;
   }
 
-  private exportPng(): void {
+  private async exportPng(): Promise<void> {
     const current: MindRenderResult | undefined = this.result;
     if (current === undefined || this.busy) {
       return;
     }
     this.busy = true;
-    PngRender.toPngBytes(current).then((bytes: Uint8Array) => {
+    this.saving = true;
+    try {
       const ctx: common.Context | undefined = this.getUIContext().getHostContext();
-      if (ctx === undefined) {
-        this.busy = false;
-        return;
+      if (ctx !== undefined) {
+        const bytes: Uint8Array = await PngRender.toPngBytes(current);
+        const saved: boolean = await AlbumImageSaver.savePngBytesToAlbum(ctx, bytes, 'mdc_mindmap');
+        if (saved) {
+          this.getUIContext().getPromptAction().showToast({
+            message: $r('app.string.mindmap_export_done'),
+            duration: 2500
+          });
+        }
       }
-      const path: string = ctx.filesDir + '/mdc_export.png';
-      const file = fileIo.openSync(path,
-        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
-      fileIo.writeSync(file.fd, bytes.buffer);
-      fileIo.closeSync(file);
-      this.busy = false;
+    } catch (err) {
+      hilog.error(0x0000, 'mdcPreview', '%{public}s', 'export failed');
       this.getUIContext().getPromptAction().showToast({
-        message: $r('app.string.mindmap_export_done', path),
+        message: $r('app.string.export_fail'),
         duration: 2500
       });
-    }).catch(() => {
-      this.busy = false;
-      hilog.error(0x0000, 'mdcPreview', '%{public}s', 'export failed');
-    });
+    }
+    this.busy = false;
+    this.saving = false;
   }
 
   private themeLabel(idx: number): ResourceStr {
@@ -185,7 +188,7 @@ struct MindmapPreviewPage {
             .fontColor($r('app.color.secondary_text'))
         }
         if (this.busy) {
-          Text($r('app.string.mindmap_rendering'))
+          Text(this.saving ? $r('app.string.mindmap_saving') : $r('app.string.mindmap_rendering'))
             .fontSize(12)
             .fontColor($r('app.color.hint_text'))
             .padding(8)

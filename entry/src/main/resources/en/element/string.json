@@ -30,7 +30,7 @@
     },
     {
       "name": "version_value",
-      "value": "v1.0.0"
+      "value": "v1.0.1"
     },
     {
       "name": "tab_convert",
@@ -122,7 +122,11 @@
     },
     {
       "name": "mindmap_export_done",
-      "value": "Saved: %s"
+      "value": "Saved to gallery"
+    },
+    {
+      "name": "mindmap_saving",
+      "value": "Exporting…"
     },
     {
       "name": "mindmap_reset_view",

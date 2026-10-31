@@ -89,6 +89,7 @@ struct MdPreviewPage {
       .layoutWeight(1)
       .width('100%')
       .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
       .backgroundColor($r('app.color.page_background'))
 
       Text($r('app.string.md_preview_demo_note'))

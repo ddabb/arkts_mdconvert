@@ -440,6 +440,7 @@ export struct ConvertPanel {
               .maxLength(MAX_CHARS)
               .height(150)
               .fontSize(13)
+              .placeholderColor($r('app.color.hint_text'))
               .backgroundColor($r('app.color.page_background'))
               .borderRadius(10)
               .onChange((value: string) => {
@@ -608,6 +609,7 @@ export struct ConvertPanel {
     .width('100%')
     .height('100%')
     .align(Alignment.Top)
+    .edgeEffect(EdgeEffect.Spring)
     .backgroundColor($r('app.color.page_background'))
   }
 }

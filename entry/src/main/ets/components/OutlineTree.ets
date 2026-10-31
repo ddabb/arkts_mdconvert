@@ -37,6 +37,7 @@ export struct OutlineTree {
       .width('100%')
       .height('100%')
       .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
       .backgroundColor($r('app.color.page_background'))
       .borderRadius(10)
     }

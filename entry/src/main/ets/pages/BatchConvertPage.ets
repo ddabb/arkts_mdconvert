@@ -326,6 +326,7 @@ struct BatchConvertPage {
       .layoutWeight(1)
       .width('100%')
       .align(Alignment.Top)
+      .edgeEffect(EdgeEffect.Spring)
 
       Button($r('app.string.batch_run'))
         .backgroundColor($r('app.color.brand'))
