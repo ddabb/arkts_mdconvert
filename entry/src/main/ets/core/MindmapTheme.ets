@@ -38,8 +38,14 @@ export class MindTheme {
       ['#38BDF8', '#2DD4BF', '#A78BFA', '#FBBF24', '#F472B6', '#4ADE80']);
   }
 
+  static print(): MindTheme {
+    return new MindTheme('print', '#FFFFFF', '#1F1F1F', '#FFFFFF', '#FFFFFF',
+      '#1F1F1F', '#9CA3AF',
+      ['#374151', '#4B5563', '#6B7280', '#374151', '#4B5563', '#6B7280']);
+  }
+
   static all(): MindTheme[] {
-    return [MindTheme.fresh(), MindTheme.journal(), MindTheme.dark()];
+    return [MindTheme.fresh(), MindTheme.journal(), MindTheme.dark(), MindTheme.print()];
   }
 
   branchColor(depth: number): string {

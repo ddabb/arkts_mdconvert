@@ -83,8 +83,13 @@ export class PngRender {
 
   static async render(src: string, theme: MindTheme,
     maxChildren: number): Promise<MindRenderResult> {
-    const metrics: RenderMetrics = new RenderMetrics(PngRender.FONT_SIZE);
     const root: MindNode = MindTreeBuilder.buildSrc(src, maxChildren);
+    MindTreeBuilder.assignPaths(root);
+    return PngRender.renderTree(root, theme);
+  }
+
+  static async renderTree(root: MindNode, theme: MindTheme): Promise<MindRenderResult> {
+    const metrics: RenderMetrics = new RenderMetrics(PngRender.FONT_SIZE);
     const layout: MindLayout = MindmapLayout.layout(root, metrics);
     const longest: number = Math.max(layout.width, layout.height);
     const scale: number = Math.min(1, PngRender.MAX_SIDE / longest);
@@ -117,7 +122,6 @@ export class PngRender {
     await result.pixelMap.release();
     return bytes;
   }
-
   static async toPngBytes(result: MindRenderResult): Promise<Uint8Array> {
     const packer: image.ImagePacker = image.createImagePacker();
     const opt: image.PackingOption = { format: 'image/png', quality: 100 };

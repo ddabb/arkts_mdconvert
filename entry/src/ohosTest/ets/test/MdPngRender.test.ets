@@ -2,6 +2,7 @@ import { describe, it, expect } from '@ohos/hypium';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { MindTheme } from '../../../main/ets/core/MindmapTheme';
 import { MindRenderResult, PngRender } from '../../../main/ets/core/PngRender';
+import { MindNode, MindTreeBuilder } from '../../../main/ets/core/MindmapTree';
 
 function perfDoc(): string {
   const lines: string[] = ['# 性能样本'];
@@ -69,7 +70,7 @@ export default function mdPngRenderTest() {
 
     it('allThemesValidPng', 0, async () => {
       const themes: MindTheme[] = MindTheme.all();
-      expect(themes.length).assertEqual(3);
+      expect(themes.length).assertEqual(4);
       for (const theme of themes) {
         const bytes: Uint8Array = await PngRender.renderBytes('# 主题', theme, 12);
         expect(bytes.length > 64).assertTrue();
@@ -77,6 +78,48 @@ export default function mdPngRenderTest() {
         expect(bytes[1]).assertEqual(0x50);
         expect(bytes[2]).assertEqual(0x4E);
       }
+    });
+
+    it('renderTreeSameAsRender', 0, async () => {
+      const src: string = '# 根\n\n## 甲\n\n- 一\n- 二\n\n## 乙\n\n- 三';
+      const viaRender: MindRenderResult = await PngRender.render(src, MindTheme.fresh(), 12);
+      const tree: MindNode = MindTreeBuilder.buildSrc(src, 12);
+      MindTreeBuilder.assignPaths(tree);
+      const viaTree: MindRenderResult = await PngRender.renderTree(tree, MindTheme.fresh());
+      expect(viaTree.nodeCount).assertEqual(viaRender.nodeCount);
+      expect(viaTree.width).assertEqual(viaRender.width);
+      expect(viaTree.height).assertEqual(viaRender.height);
+      await viaRender.pixelMap.release();
+      await viaTree.pixelMap.release();
+    });
+
+    it('renderTreeFoldedShrinks', 0, async () => {
+      const src: string = '# 根\n\n## 甲\n\n- 一\n- 二\n\n## 乙\n\n- 三';
+      const tree: MindNode = MindTreeBuilder.buildSrc(src, 12);
+      MindTreeBuilder.assignPaths(tree);
+      const collapsed: Set<string> = new Set<string>();
+      collapsed.add('0.0');
+      const pruned: MindNode = MindTreeBuilder.prune(tree, collapsed);
+      const full: MindRenderResult = await PngRender.renderTree(tree, MindTheme.fresh());
+      const folded: MindRenderResult = await PngRender.renderTree(pruned, MindTheme.fresh());
+      expect(full.nodeCount).assertEqual(6);
+      expect(folded.nodeCount).assertEqual(4);
+      expect(folded.height < full.height).assertTrue();
+      await full.pixelMap.release();
+      await folded.pixelMap.release();
+    });
+
+    it('printThemeWhiteBackground', 0, async () => {
+      const result: MindRenderResult = await PngRender.render('# 打印\n\n- 甲\n',
+        MindTheme.print(), 12);
+      const buf: ArrayBuffer = new ArrayBuffer(result.width * result.height * 4 + 4096);
+      await result.pixelMap.readPixelsToBuffer(buf);
+      const b: Uint8Array = new Uint8Array(buf);
+      expect(b[3]).assertEqual(255);
+      expect(b[0]).assertEqual(255);
+      expect(b[1]).assertEqual(255);
+      expect(b[2]).assertEqual(255);
+      await result.pixelMap.release();
     });
 
     it('themeBackgroundPixels', 0, async () => {

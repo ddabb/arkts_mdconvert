@@ -371,6 +371,22 @@
     {
       "name": "settings_docx_embed",
       "value": "Embed local images"
+    },
+    {
+      "name": "mindmap_theme_print",
+      "value": "Print"
+    },
+    {
+      "name": "mindmap_fold_panel",
+      "value": "Fold"
+    },
+    {
+      "name": "mindmap_unfold_all",
+      "value": "Unfold all"
+    },
+    {
+      "name": "mindmap_export_xmind",
+      "value": "Export .xmind"
     }
   ]
 }

@@ -371,6 +371,22 @@
     {
       "name": "settings_docx_embed",
       "value": "嵌入本地图片"
+    },
+    {
+      "name": "mindmap_theme_print",
+      "value": "打印"
+    },
+    {
+      "name": "mindmap_fold_panel",
+      "value": "折叠"
+    },
+    {
+      "name": "mindmap_unfold_all",
+      "value": "全部展开"
+    },
+    {
+      "name": "mindmap_export_xmind",
+      "value": "导出 .xmind"
     }
   ]
 }

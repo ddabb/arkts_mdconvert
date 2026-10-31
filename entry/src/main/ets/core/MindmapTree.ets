@@ -24,6 +24,8 @@ import { MdSection, MdToJson } from './MdJsonOut';
 export class MindNode {
   readonly text: string;
   readonly children: MindNode[];
+  path: string = '';
+  folded: number = 0;
   constructor(text: string, children: MindNode[]) {
     this.text = text;
     this.children = children;
@@ -207,5 +209,45 @@ export class MindTreeBuilder {
     }
     kept.push(new MindNode(`…还有 ${nodes.length - keep} 项`, []));
     return kept;
+  }
+
+  static assignPaths(root: MindNode): void {
+    MindTreeBuilder.assignPath(root, '0');
+  }
+
+  static assignPath(node: MindNode, path: string): void {
+    node.path = path;
+    for (let i: number = 0; i < node.children.length; i += 1) {
+      MindTreeBuilder.assignPath(node.children[i], path + '.' + i.toString());
+    }
+  }
+
+  static descendantCount(node: MindNode): number {
+    let n: number = node.children.length;
+    for (const c of node.children) {
+      n += MindTreeBuilder.descendantCount(c);
+    }
+    return n;
+  }
+
+  static prune(root: MindNode, collapsed: Set<string>): MindNode {
+    return MindTreeBuilder.clonePruned(root, collapsed);
+  }
+
+  static clonePruned(node: MindNode, collapsed: Set<string>): MindNode {
+    if (collapsed.has(node.path)) {
+      const foldedNode: MindNode = new MindNode(node.text, []);
+      foldedNode.path = node.path;
+      foldedNode.folded = MindTreeBuilder.descendantCount(node);
+      return foldedNode;
+    }
+    const kids: MindNode[] = [];
+    for (const c of node.children) {
+      kids.push(MindTreeBuilder.clonePruned(c, collapsed));
+    }
+    const cloned: MindNode = new MindNode(node.text, kids);
+    cloned.path = node.path;
+    cloned.folded = 0;
+    return cloned;
   }
 }
