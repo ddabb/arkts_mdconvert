@@ -1,6 +1,7 @@
 import {
   MdBlock,
   MdBold,
+  MdBreak,
   MdDoc,
   MdHeading,
   MdImage,
@@ -105,6 +106,17 @@ export class MdInlineParser {
         i += 1;
         continue;
       }
+      if (c == '<') {
+        const consumed: number = MdInlineParser.tryHtmlBreak(raw, i, buf, out);
+        if (consumed > 0) {
+          buf = '';
+          i += consumed;
+          continue;
+        }
+        buf += c;
+        i += 1;
+        continue;
+      }
       if (c == '*' || c == '_') {
         const consumed: number = MdInlineParser.tryEmphasis(raw, i, buf, out);
         if (consumed > 0) {
@@ -134,6 +146,28 @@ export class MdInlineParser {
       out.push(new MdText(buf));
     }
     return out;
+  }
+
+  static tryHtmlBreak(raw: string, i: number, buf: string, out: MdInline[]): number {
+    const lower: string = raw.substring(i).toLowerCase();
+    if (!lower.startsWith('<br')) {
+      return 0;
+    }
+    let p: number = 3;
+    while (p < lower.length && lower.charAt(p) == ' ') {
+      p += 1;
+    }
+    if (p < lower.length && lower.charAt(p) == '/') {
+      p += 1;
+    }
+    if (p >= lower.length || lower.charAt(p) != '>') {
+      return 0;
+    }
+    if (buf.length > 0) {
+      out.push(new MdText(buf));
+    }
+    out.push(new MdBreak());
+    return p + 1;
   }
 
   static tryCodeSpan(raw: string, i: number, buf: string, out: MdInline[]): number {

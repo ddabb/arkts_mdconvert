@@ -2,6 +2,7 @@ import {
   MdAlign,
   MdBlock,
   MdBold,
+  MdBreak,
   MdCode,
   MdDoc,
   MdHeading,
@@ -301,6 +302,9 @@ export class MdToJson {
       for (const item of block.items) {
         const io: JObj = new JObj();
         io.put('num', new JNum(item.num));
+        if (item.checked >= 0) {
+          io.put('checked', new JBool(item.checked == 1));
+        }
         io.put('blocks', MdToJson.blocksToJ(item.blocks));
         items.add(io);
       }
@@ -373,6 +377,9 @@ export class MdToJson {
     if (node instanceof MdImage) {
       return new JObj().put('type', new JStr('image')).put('alt', new JStr(node.alt))
         .put('url', new JStr(node.url));
+    }
+    if (node instanceof MdBreak) {
+      return new JObj().put('type', new JStr('break'));
     }
     return new JObj();
   }

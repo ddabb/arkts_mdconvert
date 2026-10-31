@@ -5,7 +5,8 @@ export enum MdInlineKind {
   Strike,
   Code,
   Link,
-  Image
+  Image,
+  Break
 }
 
 export enum MdBlockKind {
@@ -92,6 +93,12 @@ export class MdImage extends MdInline {
   }
 }
 
+export class MdBreak extends MdInline {
+  constructor() {
+    super(MdInlineKind.Break);
+  }
+}
+
 export class MdBlock {
   readonly kind: MdBlockKind;
   constructor(kind: MdBlockKind) {
@@ -151,9 +158,11 @@ export class MdThematicBreak extends MdBlock {
 export class MdListItem {
   readonly blocks: MdBlock[];
   readonly num: number;
-  constructor(blocks: MdBlock[], num: number) {
+  readonly checked: number;
+  constructor(blocks: MdBlock[], num: number, checked: number = -1) {
     this.blocks = blocks;
     this.num = num;
+    this.checked = checked;
   }
 }
 
@@ -206,6 +215,8 @@ export function collectInlineText(inlines: MdInline[], parts: string[]): void {
     } else if (node instanceof MdImage) {
       parts.push(node.alt);
       parts.push(node.url);
+    } else if (node instanceof MdBreak) {
+      parts.push(' ');
     }
   }
 }

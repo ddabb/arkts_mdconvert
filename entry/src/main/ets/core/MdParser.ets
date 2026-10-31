@@ -39,6 +39,15 @@ class MarkerInfo {
   }
 }
 
+class TaskMark {
+  readonly checked: number;
+  readonly rest: string;
+  constructor(checked: number, rest: string) {
+    this.checked = checked;
+    this.rest = rest;
+  }
+}
+
 export class MdParser {
   static parse(src: string): MdDoc {
     const normalized = src.split('\r\n').join('\n').split('\r').join('\n');
@@ -395,8 +404,12 @@ export class MdParser {
       return undefined;
     }
     const headerCells = MdParser.splitRow(line);
-    if (headerCells.length != aligns.length) {
-      return undefined;
+    const cols: number = Math.max(headerCells.length, aligns.length);
+    while (aligns.length < cols) {
+      aligns.push(MdAlign.None);
+    }
+    while (headerCells.length < cols) {
+      headerCells.push('');
     }
     const rows: MdTableCell[][] = [];
     rows.push(MdParser.cellsToRow(headerCells));
@@ -409,10 +422,44 @@ export class MdParser {
       if (t.indexOf('|') < 0) {
         break;
       }
-      rows.push(MdParser.cellsToRow(MdParser.splitRow(t)));
+      const cells = MdParser.fitColumns(MdParser.splitRow(t), cols);
+      rows.push(MdParser.cellsToRow(cells));
       j++;
     }
     return new ParseHit(new MdTable(aligns, rows), j);
+  }
+
+  static fitColumns(cells: string[], cols: number): string[] {
+    const out: string[] = [];
+    for (let k = 0; k < cols; k++) {
+      if (k < cols - 1) {
+        out.push(k < cells.length ? cells[k] : '');
+        continue;
+      }
+      if (k < cells.length) {
+        const extra = cells.slice(k);
+        out.push(extra.join(' | '));
+      } else {
+        out.push('');
+      }
+    }
+    return out;
+  }
+
+  static parseTaskMark(s: string): TaskMark | undefined {
+    if (s == '[ ]') {
+      return new TaskMark(0, '');
+    }
+    if (s == '[x]' || s == '[X]') {
+      return new TaskMark(1, '');
+    }
+    if (s.startsWith('[ ] ')) {
+      return new TaskMark(0, s.substring(4));
+    }
+    if (s.startsWith('[x] ') || s.startsWith('[X] ')) {
+      return new TaskMark(1, s.substring(4));
+    }
+    return undefined;
   }
 
   static markerInfo(line: string): MarkerInfo | undefined {
@@ -566,8 +613,9 @@ export class MdParser {
         continue;
       }
       const contentCol = pm.contentCol;
+      const mark: TaskMark | undefined = MdParser.parseTaskMark(pm.contentText);
       const itemLines: string[] = [];
-      itemLines.push(pm.contentText);
+      itemLines.push(mark === undefined ? pm.contentText : mark.rest);
       let q = p + 1;
       while (q < end) {
         const qm = MdParser.markerInfo(MdParser.expandTabs(lines[q]));
@@ -585,7 +633,7 @@ export class MdParser {
         }
         q++;
       }
-      items.push(new MdListItem(MdParser.parseBlocks(itemLines), pm.num));
+      items.push(new MdListItem(MdParser.parseBlocks(itemLines), pm.num, mark === undefined ? -1 : mark.checked));
       p = q;
     }
     return new ParseHit(new MdList(first.isOrdered, first.num, !loose, items), end);

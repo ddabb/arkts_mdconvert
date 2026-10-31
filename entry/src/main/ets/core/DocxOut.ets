@@ -2,6 +2,7 @@ import {
   MdAlign,
   MdBlock,
   MdBold,
+  MdBreak,
   MdCode,
   MdDoc,
   MdHeading,
@@ -141,15 +142,18 @@ export class MdToDocx {
     const contInd: number = baseInd + 720 * (depth + 1);
     const sb: string[] = [];
     for (const item of l.items) {
+      const task: boolean = item.checked >= 0;
+      const itemPr: string = task ? tightPr : numPr + tightPr;
+      const prefix: string = task ? (item.checked == 1 ? '\u2611 ' : '\u2610 ') : '';
       let emitted: boolean = false;
       for (const b of item.blocks) {
         if (!emitted && b instanceof MdPara) {
-          sb.push(this.para(this.inline(b.inline, ''), 'ListParagraph', numPr + tightPr, 0));
+          sb.push(this.para(prefix + this.inline(b.inline, ''), 'ListParagraph', itemPr, 0));
           emitted = true;
           continue;
         }
         if (!emitted) {
-          sb.push(this.para('', 'ListParagraph', numPr + tightPr, 0));
+          sb.push(this.para(this.run('', prefix), 'ListParagraph', itemPr, 0));
           emitted = true;
         }
         if (b instanceof MdList) {
@@ -159,7 +163,7 @@ export class MdToDocx {
         }
       }
       if (!emitted) {
-        sb.push(this.para('', 'ListParagraph', numPr + tightPr, 0));
+        sb.push(this.para(this.run('', prefix), 'ListParagraph', itemPr, 0));
       }
     }
     return sb.join('');
@@ -236,6 +240,9 @@ export class MdToDocx {
     }
     if (node instanceof MdImage) {
       return this.run(rPr, '[' + node.alt + '](' + node.url + ')');
+    }
+    if (node instanceof MdBreak) {
+      return '<w:r>' + (rPr.length > 0 ? '<w:rPr>' + rPr + '</w:rPr>' : '') + '<w:br/></w:r>';
     }
     return '';
   }

@@ -6,6 +6,7 @@ import {
   MdImage,
   MdInline,
   MdInlineCode,
+  MdInlineKind,
   MdItalic,
   MdLink,
   MdList,
@@ -306,6 +307,37 @@ export default function mdInlineTest() {
       const q: MdQuote = asQuote(blocks[0]);
       const p: MdPara = asPara(q.blocks[0]);
       expect(asText(asItalic(p.inline[1]).inline[0]).text).assertEqual('i');
+    });
+    it('htmlBreakBasic', 0, () => {
+      const nodes: MdInline[] = inl('a<br>b');
+      expect(nodes.length).assertEqual(3);
+      expect(asText(nodes[0]).text).assertEqual('a');
+      expect(nodes[1].kind).assertEqual(MdInlineKind.Break);
+      expect(asText(nodes[2]).text).assertEqual('b');
+    });
+    it('htmlBreakVariants', 0, () => {
+      const a: MdInline[] = inl('x<br/>y');
+      expect(a[1].kind).assertEqual(MdInlineKind.Break);
+      const b: MdInline[] = inl('x<br />y');
+      expect(b[1].kind).assertEqual(MdInlineKind.Break);
+      const c: MdInline[] = inl('x<BR>y');
+      expect(c[1].kind).assertEqual(MdInlineKind.Break);
+      const d: MdInline[] = inl('x<Br/>y');
+      expect(d[1].kind).assertEqual(MdInlineKind.Break);
+    });
+    it('htmlBreakNotTag', 0, () => {
+      const nodes: MdInline[] = inl('a<brave>b');
+      expect(nodes.length).assertEqual(1);
+      expect(asText(nodes[0]).text).assertEqual('a<brave>b');
+    });
+    it('parseFullTableCellBr', 0, () => {
+      const blocks: MdBlock[] = MdInlineParser.parseFull('| h |\n| --- |\n| a<br>b |').blocks;
+      const t: MdTable = asTable(blocks[0]);
+      const cell: MdInline[] = t.rows[1][0].inline;
+      expect(cell.length).assertEqual(3);
+      expect(asText(cell[0]).text).assertEqual('a');
+      expect(cell[1].kind).assertEqual(MdInlineKind.Break);
+      expect(asText(cell[2]).text).assertEqual('b');
     });
     it('inlineLosslessSweep', 0, () => {
       assertInlineLossless('**bold** _em_ ~~s~~ `c` [t](u) ![a](i)');

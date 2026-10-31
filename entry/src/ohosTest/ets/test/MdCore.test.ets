@@ -117,6 +117,12 @@ function assertLossless(src: string): void {
   expect(isSubseq(alnumOf(src), alnumOf(collected))).assertTrue();
 }
 
+function assertLosslessTask(src: string): void {
+  let stripped = src.split('[ ] ').join('').split('[x] ').join('').split('[X] ').join('');
+  stripped = stripped.split('[ ]').join('').split('[x]').join('').split('[X]').join('');
+  assertLossless(stripped);
+}
+
 export default function mdCoreTest(): void {
   describe('mdCoreTest', () => {
     it('emptyDoc', 0, () => {
@@ -294,6 +300,54 @@ export default function mdCoreTest(): void {
       expect(inlineTextOf(asPara(l.items[0].blocks[0]).inline)).assertEqual('a\nlazy');
     });
 
+    it('taskListBasic', 0, () => {
+      const src = '- [ ] 待办\n- [x] 已完成\n- 普通项';
+      const l = asList(single(src));
+      expect(l.items.length).assertEqual(3);
+      expect(l.items[0].checked).assertEqual(0);
+      expect(inlineTextOf(asPara(l.items[0].blocks[0]).inline)).assertEqual('待办');
+      expect(l.items[1].checked).assertEqual(1);
+      expect(inlineTextOf(asPara(l.items[1].blocks[0]).inline)).assertEqual('已完成');
+      expect(l.items[2].checked).assertEqual(-1);
+      assertLosslessTask(src);
+    });
+
+    it('taskListUpperX', 0, () => {
+      const l = asList(single('- [X] done'));
+      expect(l.items[0].checked).assertEqual(1);
+      expect(inlineTextOf(asPara(l.items[0].blocks[0]).inline)).assertEqual('done');
+    });
+
+    it('taskListOrdered', 0, () => {
+      const src = '1. [ ] first\n2. [x] second';
+      const l = asList(single(src));
+      expect(l.ordered).assertTrue();
+      expect(l.items[0].checked).assertEqual(0);
+      expect(l.items[1].checked).assertEqual(1);
+      assertLosslessTask(src);
+    });
+
+    it('taskListEmptyItem', 0, () => {
+      const l = asList(single('- [x]'));
+      expect(l.items[0].checked).assertEqual(1);
+      expect(l.items[0].blocks.length).assertEqual(0);
+    });
+
+    it('taskListNoSpaceDegrade', 0, () => {
+      const l = asList(single('- [ ]nospace'));
+      expect(l.items[0].checked).assertEqual(-1);
+      expect(inlineTextOf(asPara(l.items[0].blocks[0]).inline)).assertEqual('[ ]nospace');
+    });
+
+    it('taskListNestedTask', 0, () => {
+      const src = '- [ ] 外层\n  - [x] 内层';
+      const l = asList(single(src));
+      expect(l.items[0].checked).assertEqual(0);
+      const inner = asList(l.items[0].blocks[1]);
+      expect(inner.items[0].checked).assertEqual(1);
+      assertLosslessTask(src);
+    });
+
     it('listWithCode', 0, () => {
       const src = '- a\n\n  ```\n  code line\n  ```';
       const l = asList(single(src));
@@ -400,8 +454,39 @@ export default function mdCoreTest(): void {
       const src = '| a | b |\n| --- | --- |\n| 1 | 2 | 3 |';
       const t = asTable(single(src));
       expect(t.rows.length).assertEqual(2);
-      expect(t.rows[1].length).assertEqual(3);
+      expect(t.rows[1].length).assertEqual(2);
+      expect(inlineTextOf(t.rows[1][1].inline)).assertEqual('2 | 3');
+      assertLossless(src);
+    });
+
+    it('tableHeaderMoreCols', 0, () => {
+      const src = '| a | b | c |\n| --- | --- |\n| 1 | 2 | 3 |';
+      const t = asTable(single(src));
+      expect(t.aligns.length).assertEqual(3);
+      expect(t.aligns[2]).assertEqual(MdAlign.None);
+      expect(t.rows[0].length).assertEqual(3);
+      expect(inlineTextOf(t.rows[0][2].inline)).assertEqual('c');
       expect(inlineTextOf(t.rows[1][2].inline)).assertEqual('3');
+      assertLossless(src);
+    });
+
+    it('tableDelimMoreCols', 0, () => {
+      const src = '| a |\n| --- | --- | --- |\n| 1 | 2 | 3 |';
+      const t = asTable(single(src));
+      expect(t.aligns.length).assertEqual(3);
+      expect(t.rows[0].length).assertEqual(3);
+      expect(inlineTextOf(t.rows[0][0].inline)).assertEqual('a');
+      expect(inlineTextOf(t.rows[0][1].inline)).assertEqual('');
+      expect(inlineTextOf(t.rows[1][2].inline)).assertEqual('3');
+      assertLossless(src);
+    });
+
+    it('tableShortDataRow', 0, () => {
+      const src = '| a | b | c |\n| --- | --- | --- |\n| 1 |';
+      const t = asTable(single(src));
+      expect(t.rows[1].length).assertEqual(3);
+      expect(inlineTextOf(t.rows[1][0].inline)).assertEqual('1');
+      expect(inlineTextOf(t.rows[1][1].inline)).assertEqual('');
       assertLossless(src);
     });
 

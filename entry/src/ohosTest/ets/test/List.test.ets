@@ -9,6 +9,7 @@
 import abilityTest from './Ability.test';
 import mdCoreTest from './MdCore.test';
 import mdInlineTest from './MdInline.test';
+import mdRobustTest from './MdRobust.test';
 import mdJsonTest from './MdJson.test';
 import mdYamlTest from './MdYaml.test';
 import mdDocxTest from './MdDocx.test';
@@ -23,6 +24,7 @@ export default function testsuite() {
   abilityTest();
   mdCoreTest();
   mdInlineTest();
+  mdRobustTest();
   mdJsonTest();
   mdYamlTest();
   mdDocxTest();
